@@ -1,3 +1,9 @@
+from prettytable import PrettyTable
+import locale
+import numpy as np
+import prettytable
+from prettytable.prettytable import PLAIN_COLUMNS
+
 def annuity(
     amount:float,
     apr:float,
@@ -8,19 +14,59 @@ def annuity(
     a /= (1+i)**months -1
     return a
 
+
+def annuity_table(
+    amount:np.ndarray or list,
+    apr:np.ndarray or list,
+    months:np.ndarray or list,
+):
+    av, iv, mv= np.meshgrid(amount, apr/12, months)
+    a = av * iv * (1 + iv)**mv
+    a /= (1+iv)**mv -1
+    return a
+
+def pretty_annuity_table(
+    amount:np.ndarray,
+    apr:np.ndarray,
+    months:int,
+)->PrettyTable:
+     
+    x = PrettyTable()
+    x.set_style(PLAIN_COLUMNS)
+
+    x.field_names = ['APR'] + [locale.currency(j) for j in amount]
+    A = annuity_table(amount, apr, months)
+    for rate, bills in zip(apr, A):
+        tablerow = ['{:.2%}'.format(rate)]
+        for m in bills:
+            tablerow.append(locale.currency(m))
+        x.add_row(tablerow)
+    return x
+
+
 if __name__ == '__main__':
-    cost = 100000
-    i = 0.04
-    n = 12 * 5
+    locale.setlocale(locale.LC_ALL, '')
+    starting_savings = 7000
+    monthly_rates = np.asarray([500, 600, 700, 750, 800, 1000])
+    save_time = 1 # months after Feb 1, 2022
+    cost = 28000 # brand new Tacoma cost 2021
 
-    A = annuity(cost, i, n)
-    print(A)
 
-    owed = cost
+    saved = starting_savings + (save_time * monthly_rates)
+    loans = cost - saved
 
-    k = 0
-    while owed > 0 :
-        k+= 1
-        interest = owed * i/12
-        owed += interest - A
-        print('After month {: >2}, ${:>5,} left'.format(k, owed))
+    # interest
+    i = np.linspace(start=2.49, stop=5, num=20)/100
+    n = np.asarray([12,18,24,30,36,42,48,54,60,66,72])
+
+    base = 10000
+
+    a = np.zeros((i.size, n.size))
+
+    for ij, rate in enumerate(i):
+        for nj, term in enumerate(n):
+            a[ij, nj] = annuity(base, rate, term)
+        print(rate, [locale.currency(m) for m in a[ij]])
+    
+
+
