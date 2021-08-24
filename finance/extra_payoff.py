@@ -11,7 +11,7 @@ if __name__ == '__main__':
     ir = (apr)/12
 
     # extra_principle_payment = 300
-    monthly = 0
+    monthly = 1500
 
     while amount > 0:
         min_payment = loans.annuity(amount, apr, term)
@@ -27,7 +27,8 @@ if __name__ == '__main__':
 
         string = 'Month: {:>3} | Interest: {:>8.2f} | Principle: {:>8.2f} | Extra: {:>8.2f} | Total Payment: {:>8.2f} | Remaining: {:>10.2f}'.format(
             j, interest, pricinple_payment, extra_principle_payment, total_payment, amount)
-        print(string)
+        if amount > 0:
+            print(string)
 
         j += 1
         term += -1

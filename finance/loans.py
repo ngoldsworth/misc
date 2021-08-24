@@ -1,3 +1,4 @@
+from os import remove
 from prettytable import PrettyTable
 import locale
 import numpy as np
@@ -24,6 +25,32 @@ def annuity_table(
     a = av * iv * (1 + iv)**mv
     a /= (1+iv)**mv -1
     return a
+
+
+def amoritization_table(
+    amount:float,
+    apr:float,
+    term:int,
+)->np.ndarray:
+    """
+    @param amount: loan amount
+    @param apr: Annual Percentage Rate expressed as fraction
+    @param term: number of months in the loan
+    """
+    amor_tab = np.empty((term, 3), dtype=float)
+    monthly_payment = annuity(amount, apr, term)
+    effective_interest_rate = apr/12
+    remaining=amount
+
+    for j in range(term):
+        interest = remaining * effective_interest_rate
+        principle_payment = monthly_payment - interest
+        remaining -= monthly_payment
+        amor_tab[j] = np.asarray([float(interest), float(principle_payment), float(remaining)], dtype=float)
+
+    return amor_tab
+
+
 
 def pretty_annuity_table(
     amount:np.ndarray,
@@ -68,5 +95,5 @@ if __name__ == '__main__':
             a[ij, nj] = annuity(base, rate, term)
         print(rate, [locale.currency(m) for m in a[ij]])
     
-
+    print(amoritization_table(10000, 4.15/100, 120))
 
