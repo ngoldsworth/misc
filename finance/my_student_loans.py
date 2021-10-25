@@ -2,16 +2,16 @@ import loans
 from math import ceil
 
 if __name__ == "__main__":
-    initial_amount = 35700 - 15000
-    term = 60
-    apr = 4.15 / 100
+    initial_amount = 25000 * .8
+    term = 12 * 6
+    apr = 2.125 / 100
 
     monthly_due = loans.annuity(initial_amount, apr=apr, months=term)
 
     remaining = initial_amount
     original_total = monthly_due * term
 
-    monthly_actual = 7
+    monthly_actual = 400
 
     m = 1
 
