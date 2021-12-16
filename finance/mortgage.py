@@ -8,14 +8,15 @@ if __name__ == "__main__":
     apr = 3.15 / 100
 
     initial_amount = cost - down
-    rent_in = 750 * 3
+    rent_in = 650 * 3
 
     monthly_due = loans.annuity(initial_amount, apr=apr, months=term)
+    print("Initial monthly: {:.2f}".format(monthly_due))
 
     remaining = initial_amount
     original_total = monthly_due * term
 
-    monthly_actual = rent_in + 900
+    monthly_actual = rent_in + 1200
 
     m = 1
 
