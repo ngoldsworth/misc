@@ -1,8 +1,6 @@
-./__pycache__
 
-
-# Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,vim,latex
-# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,vim,latex
+# Created by https://www.toptal.com/developers/gitignore/api/vim,latex
+# Edit at https://www.toptal.com/developers/gitignore?templates=vim,latex
 
 ### LaTeX ###
 ## Core latex/pdflatex auxiliary files:
@@ -322,24 +320,4 @@ tags
 # Persistent undo
 [._]*.un~
 
-### VisualStudioCode ###
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-*.code-workspace
-
-# Local History for Visual Studio Code
-.history/
-
-### VisualStudioCode Patch ###
-# Ignore all local history of files
-.history
-.ionide
-
-# Support for Project snippet scope
-!.vscode/*.code-snippets
-
-# End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,vim,latex
-
+# End of https://www.toptal.com/developers/gitignore/api/vim,latex

@@ -1,0 +1,78 @@
+\documentclass{book}
+
+\usepackage{libertine}
+\usepackage{FiraMono}
+\usepackage{newclude}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{nicefrac}
+
+\usepackage[
+	outer=1.25in,
+	inner=1.5in,
+	headsep=.5in,
+]{geometry}
+
+\title{Recipes I've Collected}
+\author{Nelson G}
+
+
+\usepackage[pagestyles]{titlesec}
+		\newpagestyle{main2}{
+				 \sethead[\small{\textsc{\oldstylenums{\thepage}\quad|\quad recipes}}][][]
+				 {}{}{\small{\textsc{chapter \oldstylenums{\thechapter}: \MakeLowercase{\chaptertitle} \quad | \quad \oldstylenums{\thepage}}}}
+					 }
+		\newpagestyle{main}{
+				\sethead[\small{\oldstylenums{\thepage}}][\small{\textit{Chapter \oldstylenums{\thechapter}}}][]
+				{}{\small{\textit{\chaptertitle}}}{\small{\oldstylenums{\thepage}}}
+					 }
+
+\newcommand{\fromMom}{\textit{This recipe is from Mom.}}
+
+\newcommand{\recipe}[1]{
+    \addcontentsline
+        {toc}
+        {subsection}
+        {#1}
+        \section*{#1}
+}
+\newcommand{\ingredients}{\subsubsection*{Ingredients}}
+\newcommand{\instructions}{\subsubsection*{Instructions}}
+\newcommand{\notes}{\paragraph*{Notes}}
+
+\begin{document}
+
+\pagestyle{empty}
+\maketitle
+\tableofcontents
+
+\pagestyle{main}
+
+\chapter{Crock Pot and Slow Cooker}
+\include{./crock_pot/cp_BBQ_Loafers}
+\include{./crock_pot/cp_Chili}
+\include{./crock_pot/cp_Honey_chicken_thighs_}
+\include{./crock_pot/cp_Italian_Chicken_Turkey}
+\include{./crock_pot/cp_Jambalaya}
+\include{./crock_pot/cp_Mexican_Casserole}
+\include{./crock_pot/cp_barbacoa_brisket}
+\include{./crock_pot/cp_chicken_fajitas}
+\include{./crock_pot/cp_enchilada_dip}
+\include{./crock_pot/cp_mozzarella_meatballs}
+\include{./crock_pot/cp_pinto_beans}
+\include{./crock_pot/cp_quick_salsa_chicken}
+\include{./crock_pot/cp_slow_cooker_beans_and_chilli}
+\include{./crock_pot/cp_turkey_breast}
+
+\chapter{Grill}
+\include{./grill/turkey_burgers}
+
+\chapter{Other}
+\include{./other/beer_bread}
+\include{./other/cast_iron_mix}
+\include{./other/jack_daniels_pie}
+
+\chapter{Soup}
+\include{./crock_pot/cp_zuppa_toscana}
+
+\end{document}
