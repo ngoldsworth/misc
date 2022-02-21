@@ -2,24 +2,27 @@ import loans
 from math import ceil
 
 if __name__ == "__main__":
-    initial_amount = 100000
-    term = 120
-    apr = 3.625/ 100
+    cost = 750000
+    down = 250000
+    term = 360
+    apr = 3.15 / 100
+
+    initial_amount = cost - down
+    rent_in = 650 * 3
 
     monthly_due = loans.annuity(initial_amount, apr=apr, months=term)
+    print("Initial monthly: {:.2f}".format(monthly_due))
 
     remaining = initial_amount
     original_total = monthly_due * term
 
-    monthly_actual = monthly_due * 1.15
+    monthly_actual = rent_in + 1200
 
     m = 1
 
     payment = max(monthly_actual, monthly_due)
     total_paid = 0
     total_interest = 0
-
-    print("Mininum payment: {:.2f}".format(loans.annuity(remaining, apr, term)))
 
     while remaining > 0:
         interest = (apr / 12) * remaining
