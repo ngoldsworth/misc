@@ -11,7 +11,7 @@ def annuity(
     a /= (1 + i) ** months - 1
     return a
 
-saved = 17000
+saved = 23650
 
 student_loans = [
     (5672, .0429),
@@ -48,5 +48,5 @@ print("{:%} is rounded up to nearest eighth at {:%}".format(new_rate, rounded_ra
 print("New Rate: {:%}, Total Balance: {}".format(rounded_rate, total_principle))
 print("With a .25% interest deduction: {:%}".format(rounded_rate - .0025))
 
-months = 120
+months = 96
 print("Monthly payment on {} month loan at {:%}: {:.2f}".format(months, discounted_rate, annuity(total_principle, discounted_rate, months)))
