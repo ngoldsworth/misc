@@ -91,6 +91,23 @@ def partitions(n, k=None):
 
         yield ms
 
+def g(n, part, base):
+
+    # "Length" of the partition, 
+    # i.e.: how many parts,
+    # i.e.: how many letters in generic pattern
+    # i.e.: number of unique digits
+    m = len(part)
+
+    # account for any digit that could fill a slot
+    to_each_digit_multiplier = m.perm(b, m)
+
+    mc_lst = [v for k:v in part]
+    mc_multiplier = multinomial_coefficient(n, mc_lst)
+
+
+
+
 
 if __name__ == '__main__':
     base = 10 # try for hexadecimal later
