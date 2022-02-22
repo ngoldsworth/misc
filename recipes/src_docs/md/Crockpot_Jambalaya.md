@@ -1,0 +1,46 @@
+**[Crockpot Jambalaya]{.underline}**
+
+\* This easy recipe can be adapted to your tastes by using all green
+peppers instead of celery. But celery, onions, and peppers are the holy
+trinity of Cajun flavors traditional to jambalaya. When I made it, I
+omitted the celery and added red and yellow bell peppers.*
+
+-   -   1/2 lb. andouille or spicy pork sausage, cut into pieces
+
+-   3 stalks celery, chopped
+
+-   1 lb. boneless skinless chicken thighs, cut into 1\" pieces
+
+-   1 onion, chopped
+
+-   3 cloves garlic, minced
+
+-   2 (14 oz.) cans diced tomatoes, undrained
+
+-   1 Tbsp. sugar
+
+-   1/8 teaspoon pepper
+
+-   1 green bell pepper, cut into 1\" pieces
+
+-   1-3 tsp. Tabasco Sauce
+
+-   1/8 tsp. cayenne pepper
+
+-   1/2 tsp. dried thyme leaves
+
+-   1/2 tsp. dried basil leaves
+
+-   1/2 cup uncooked orzo pasta
+
+-   1 lb. frozen fully cooked shrimp, thawed
+
+ In medium saucepan, cook sausage until some of the fat is rendered.
+Discard fat, and combine sausage with all ingredients except orzo and
+shrimp in slow cooker. Cover and cook on LOW for 7 to 9 hours until
+chicken is cooked through. Increase heat to HIGH. Stir in orzo, cover
+and cook for 15 minutes, or until orzo is tender. Add shrimp, stir,
+cover and cook an additional 3-5 minutes until shrimp is heated through.
+
+If you have a new, hotter cooking crockpot check the dish after 5 hours
+on low. The pasta should cook in about the same time.

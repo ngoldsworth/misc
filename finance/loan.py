@@ -1,4 +1,4 @@
-from finance.comparisons import annuity
+import matplotlib.pyplot as plt
 from os import remove
 from prettytable import PrettyTable
 import locale
@@ -8,6 +8,11 @@ from prettytable.prettytable import PLAIN_COLUMNS
 
 
 class Loan():
+    """
+    :param principle: initial principle on the loan
+    :param period_rate: interest rate, amount charged per period
+    :
+    """
     def __init__(
         self,
         principle: float,
@@ -17,6 +22,16 @@ class Loan():
         self._original_principle = principle
         self._rate = period_rate
         self._term = periods
+
+        self._current_balance = self._original_principle
+        self._period_idx = 0
+
+        self._payments = []
+        self._interest = []
+
+    @property
+    def remaining_periods(self):
+        return self._term - self._period_idx
     
     def annuity(
         self, 
@@ -34,13 +49,67 @@ class Loan():
         if term is None:
             term = self._term
 
-        a = principle * rate * (1+rate)**term
-        a /= (1 * rate)**term -1
-        return a
+        # a = principle * rate * (1+rate)**term
+        # a /= (1 * rate)**term -1
 
-    def amoritization(self)->np.ndarray:
-        amor_tab = np.empty((term, 3), dtype=float)
+        a = (rate * principle)
+        d = 1 - (1+rate)**(-term)
+        return a/d
+
+    @property
+    def original_principle(self):
+        return self._original_principle
+    
+    @property
+    def original_minimum_payment(self):
+        return self.payment(
+            self._original_principle,
+            self._rate,
+            self._term
+        )
+    
+    def reset(self):
+        """
+        Returns the loan to payment 0.
+        """
+        self._current_balance = self._original_principle
+        self._period_idx = 0
+
+        self._payments = []
+        self._interest = []
+
+    def minimum_payment(self):
+        return self.annuity(
+            self._current_balance,
+            self._rate,
+            self.remaining_periods
+        )
+
+    def make_payment(self, amount=None):
+        """
+        Progress the loan forward in its life one period. Raises value error if
+        `amount` is smaller than the minimum on the remaining life of the loan.
+        Defaults to minimum payment.
+        """
+        if amount is None:
+            amount = self.minimum_payment()
+        if amount < self.minimum_payment():
+            raise ValueError("Too small a payment")
+        
+        interest = self._rate * self._current_balance
+        self._current_balance += interest - amount
+
+        self._interest.append(interest)
+        self._payments.append(amount)
+        self._period_idx += 1
+
+    def amortization_schedule(self)->np.ndarray:
+        """
+        Simulate the entire life of the loan.
+        """
+        amor_tab = np.empty((self._term, 3), dtype=float)
         monthly_payment = self.annuity()
+        print(monthly_payment)
 
         remaining_principle = self._original_principle
 
@@ -50,32 +119,27 @@ class Loan():
             remaining_principle -= monthly_payment
             amor_tab[j] = np.asarray([interest_payment, principle_payment, remaining_principle])
 
+            print(interest_payment, principle_payment, remaining_principle)
+
         return amor_tab
 
-def amoritization_table(
-    amount:float,
-    apr:float,
-    term:int,
-)->np.ndarray:
-    """
-    @param amount: loan amount
-    @param apr: Annual Percentage Rate expressed as fraction
-    @param term: number of months in the loan
-    """
-    amor_tab = np.empty((term, 3), dtype=float)
-    monthly_payment = annuity(amount, apr, term)
-    effective_interest_rate = apr/12
-    remaining=amount
+    def amortization_bar_plot(self):
+        fig, ax = plt.subplots()
 
-    for j in range(term):
-        interest = remaining * effective_interest_rate
-        principle_payment = monthly_payment - interest
-        remaining -= monthly_payment
-        amor_tab[j] = np.asarray([float(interest), float(principle_payment), float(remaining)], dtype=float)
+        amor_tab = self.amortization_schedule()
+        period = np.arange(self._term)
+        ax.bar(period, amor_tab[:,1], label="Principle")
+        ax.bar(period, amor_tab[:,0], label="Interest")
 
-    return amor_tab
+        ax.set_ylabel("Dollars")
+        ax.set_xlabel("Period")
+        ax.legend()
+
+        return fig, ax
+
 
 if __name__ == '__main__':
+    """
     locale.setlocale(locale.LC_ALL, '')
     starting_savings = 7000
     monthly_rates = np.asarray([500, 600, 700, 750, 800, 1000])
@@ -90,14 +154,9 @@ if __name__ == '__main__':
     i = np.linspace(start=2.49, stop=5, num=20)/100
     n = np.asarray([12,18,24,30,36,42,48,54,60,66,72])
 
-    base = 10000
-
-    a = np.zeros((i.size, n.size))
-
-    for ij, rate in enumerate(i):
-        for nj, term in enumerate(n):
-            a[ij, nj] = annuity(base, rate, term)
-        print(rate, [locale.currency(m) for m in a[ij]])
+   """ 
+    my_loan = Loan(10**6, .003, 360)
+    fig, ax = my_loan.amortization_bar_plot()
+    plt.show()
     
-    print(amoritization_table(10000, 4.15/100, 120))
 
