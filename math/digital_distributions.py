@@ -1,18 +1,21 @@
 import typing as t
-import math as m
+import math
+from sympy import re
 
-def multinomial_coefficient(
-        n:int,
-        k: t.List[int]
-)->int:
-    num = m.factorial(n)
-    for ki in k:
-        num /= ki
+from sympy.utilities.iterables import partitions
+
+
+def multinomial_coefficient(n: int, k: t.List[int]) -> int:
+    num = math.factorial(n)
+
+    # don't need to divide by 1
+    for i in k:
+        num /= i
 
     return num
 
 
-def partitions(n, k=None):
+def partitions_generator(n, k=None):
     """Generate all partitions of integer n (>= 0) using integers no
     greater than k (default, None, allows the partition to contain n).
 
@@ -57,7 +60,7 @@ def partitions(n, k=None):
         k = n
 
     q, r = divmod(n, k)
-    ms = {k : q}
+    ms = {k: q}
     keys = [k]
     if r:
         ms[r] = 1
@@ -91,25 +94,83 @@ def partitions(n, k=None):
 
         yield ms
 
-def g(n, part, base):
 
-    # "Length" of the partition, 
-    # i.e.: how many parts,
-    # i.e.: how many letters in generic pattern
-    # i.e.: number of unique digits
-    m = len(part)
+def partition_to_list(partition:dict)->list:
+    lst = []
+    for k in partition:
+        for j in range(partition[k]):
+            lst.append(k)
+    
+    return lst
+
+def partition_number_of_parts(partition:dict)->int:
+    count = 0
+    for k in partition:
+        count += partition[k]
+    
+    return count
+
+def repeat_count(partition:dict)->int:
+    r = 1
+    for k in partition:
+        r *= math.factorial(partition[k]) 
+    
+    return r
+
+def g(digit_count: int, base: int, partition: dict):
 
     # account for any digit that could fill a slot
-    to_each_digit_multiplier = m.perm(b, m)
+    # if a number hs 3 unique digits "A", "B", and "C"
+    # 10 ways to assign to A, leaving 9 ways to  assign to B, C has 8...
 
-    mc_lst = [v for k:v in part]
-    mc_multiplier = multinomial_coefficient(n, mc_lst)
+    # if "AABC", filling assigning digits is not dependent on number of digits, but number of unique digits
+    unique_digits = partition_number_of_parts(partition)
+    assign_digits = math.perm(base, unique_digits)
+
+    # a four-digit number with three 2 unique digits can be written "ABAB", "AABB" "BABA" "BBAA"...
+    # there are multiple qays to arrange repeated values
+    arrangement_coeff = multinomial_coefficient(digit_count, partition_to_list(partition))
+
+    # In a 6 digit number, the pattern "AAABBB" and "BBBAAA" describe the same set of numbers, divide by 2!
+    # "AABBCC" and "BBAACC" and "CCBBAA"... describe te same set of numbers, divide by 6 = 3!
+    # do this division since acounting for A={1..9}, B={1..9, != A} done in 
+    repeat_divisor = repeat_count(partition)
+
+    return assign_digits * arrangement_coeff / repeat_divisor
+    # return arrangement_coeff * assign_digits
 
 
 
 
 
-if __name__ == '__main__':
-    base = 10 # try for hexadecimal later
-    num_digits = 6 # total number of digits in the number
-    num_unique = 3 # number of uniqe digits in the number
+if __name__ == "__main__":
+    base = 10  # try for hexadecimal later
+    num_digits = 6  # total number of digits in the number
+    num_unique = 3  # number of uniqe digits in the number
+
+
+    """
+    sympy.utilities.iterables.partitions produces dicts of the format
+    {4: 1} as in "4 occurs in this partition once"
+    {3: 2, 1: 1} as in "3 occurs as a part twice and 1 occurs once as a part"
+    """
+
+    g_tot = 0
+
+    for j in partitions(num_digits, m=base):
+        gi = g(num_digits, base, j)
+        g_tot += gi
+        print(gi, j)
+        print(j, partition_number_of_parts(j))
+
+    print("")
+    print(g_tot)
+    print(math.perm(base, num_digits))
+
+    # c = 0
+    # for j in range(0, 10000):
+    #     if len(set(str(j).zfill(4))) == 2:
+    #         print(j)
+    #         c += 1
+    # print(c)
+        
