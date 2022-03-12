@@ -1,9 +1,14 @@
+from filecmp import cmp
+import itertools
 import typing as t
 import math
-from sympy import re
+
+import numpy as np
+
+import matplotlib.pyplot as plt
 
 from sympy.utilities.iterables import partitions
-
+from sympy.functions.combinatorial.numbers import stirling
 
 def multinomial_coefficient(n: int, k: t.List[int]) -> int:
     num = math.factorial(n)
@@ -140,14 +145,109 @@ def g(digit_count: int, base: int, partition: dict):
     # return arrangement_coeff * assign_digits
 
 
+def h(num_digits, base, unique_digits)->int:
+    if unique_digits > base:
+        raise ValueError("Can't have more unique digits than number of possible distinct digits (the base)")
+    elif unique_digits == base:
+        return stirling(num_digits, unique_digits)
+    else:
+        return math.perm(base, unique_digits) * stirling(num_digits, unique_digits)
+    
+def unique_perms(series):
+    return{"".join(p) for p in itertools.permutations(series)}
+
+def next_permutation(seq, pred=cmp):
+    """Like C++ std::next_permutation() but implemented as
+    generator. Yields copies of seq."""
+
+    def reverse(seq, start, end):
+        # seq = seq[:start] + reversed(seq[start:end]) + \
+        #       seq[end:]
+        end -= 1
+        if end <= start:
+            return
+        while True:
+            seq[start], seq[end] = seq[end], seq[start]
+            if start == end or start+1 == end:
+                return
+            start += 1
+            end -= 1
+    
+    if not seq:
+        raise StopIteration
+
+    try:
+        seq[0]
+    except TypeError:
+        raise TypeError("seq must allow random access.")
+
+    first = 0
+    last = len(seq)
+    seq = seq[:]
+
+    # Yield input sequence as the STL version is often
+    # used inside do {} while.
+    yield seq
+    
+    if last == 1:
+        raise StopIteration
+
+    while True:
+        next = last - 1
+
+        while True:
+            # Step 1.
+            next1 = next
+            next -= 1
+            
+            if pred(seq[next], seq[next1]) < 0:
+                # Step 2.
+                mid = last - 1
+                while not (pred(seq[next], seq[mid]) < 0):
+                    mid -= 1
+                seq[next], seq[mid] = seq[mid], seq[next]
+                
+                # Step 3.
+                reverse(seq, next1, last)
+
+                # Change to yield references to get rid of
+                # (at worst) |seq|! copy operations.
+                yield seq[:]
+                break
+            if next == first:
+                raise StopIteration
+    raise StopIteration
+
+
+def cooper_kennedy_coding(series: list)->tuple:
+    d = {}
+    pattern = [] 
+
+    for i, ch in enumerate(series):
+        if ch not in d:
+            d[ch] = i
+        pattern.append(d[ch])
+    
+    return tuple(pattern)
+
+def num_unique_ck_codings(series: list):
+    unq = list(unique_perms(series))
+
+    ck_list = []
+    for perm in unq:
+        ck_list.append(cooper_kennedy_coding(perm))
+    
+    return len(set(ck_list))
 
 
 
 if __name__ == "__main__":
-    base = 10  # try for hexadecimal later
+    base = 6  # try for hexadecimal later
     num_digits = 6  # total number of digits in the number
-    num_unique = 3  # number of uniqe digits in the number
 
+    k = []    
+    lst0 = []
+    lst1 = []
 
     """
     sympy.utilities.iterables.partitions produces dicts of the format
@@ -155,22 +255,36 @@ if __name__ == "__main__":
     {3: 2, 1: 1} as in "3 occurs as a part twice and 1 occurs once as a part"
     """
 
-    g_tot = 0
+    # for u in range(1, num_digits+1):
+    #     k.append(u)
+    #     lst.append(h(num_digits, base, u))
 
-    for j in partitions(num_digits, m=base):
-        gi = g(num_digits, base, j)
-        g_tot += gi
-        print(gi, j)
-        print(j, partition_number_of_parts(j))
+    # y = np.asarray(lst)
+    # y /= y.sum()
+    # # plt.bar(k, y)
+    # # plt.show()
 
-    print("")
-    print(g_tot)
-    print(math.perm(base, num_digits))
+    base_patterns = [
+        "AABB", "AABBC", "AABBCC", "AABBCD", "AAABBB",
+        "AABBCDD",
+        "AABBCDDEE",
+    ]
 
-    # c = 0
-    # for j in range(0, 10000):
-    #     if len(set(str(j).zfill(4))) == 2:
-    #         print(j)
-    #         c += 1
-    # print(c)
-        
+    # for pat in base_patterns:
+    #     perms = unique_perms(pat)
+    #     n_perms = len(perms)
+
+    #     n_ck = num_unique_ck_codings(pat)
+
+    #     s = "{:>11}: {:>4} / {:>4} = {:>4}".format(pat, n_perms, n_ck, n_perms/n_ck)
+    #     print(s)
+
+    fig, ax = plt.subplots(1,1)
+    for j in range(30):
+        k.append(j)
+        lst0.append(stirling(j, j//2))
+        lst1.append(stirling(j, j//2 + 3))
+    ax.plot(k, lst0)
+    ax.plot(k, lst1)
+    ax.set_yscale('log')
+    plt.show()
