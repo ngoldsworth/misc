@@ -1,3 +1,7 @@
+"""
+I was watching a Numberphile video with Matt Parker, he was talking about the Van Eck sequence.
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 

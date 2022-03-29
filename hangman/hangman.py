@@ -39,15 +39,15 @@ def best_next_word(
     for char in ascii_lowercase:
         alphabet = {**alphabet, char:0}
 
-    print(alphabet['z'])
+    
 
 
 
 
 
 if __name__ == '__main__':
-    main_word = '___erer_______'
-    excludes =  'i'
+    main_word = 'cr___'
+    excludes =  'sotlirp'
     possible_words(pl.Path('./hangman/wordlist.txt'), main_word, excludes)
-    #best_next_word(pl.Path('./wordlist.txt'), 'word', 'zr's
+    # best_next_word(pl.Path('./wordlist.txt'), 'word', 'zr')
 
