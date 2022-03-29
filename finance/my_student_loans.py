@@ -2,16 +2,16 @@ import loans
 from math import ceil
 
 if __name__ == "__main__":
-    initial_amount = 100000
-    term = 120
-    apr = 3.625/ 100
+    initial_amount = 1500000
+    term = 360
+    apr = 3.425/ 100
 
     monthly_due = loans.annuity(initial_amount, apr=apr, months=term)
 
     remaining = initial_amount
     original_total = monthly_due * term
 
-    monthly_actual = monthly_due * 1.15
+    monthly_actual = monthly_due * 1.5
 
     m = 1
 
@@ -59,8 +59,7 @@ if __name__ == "__main__":
         # if remaining > 0:
         print(table_row)
 
-    print(
-        "Total Interest: {:>10.2f} ({:>4.2%})".format(
-            total_interest, total_interest / total_paid
-        )
-    )
+    print( "Total Interest: {:>10.2f}".format( total_interest ))
+    print( "Interest is {:>4.2%} of total dolars paid".format(total_interest / total_paid))
+
+    print( "and is      {:>4.2%} of  original principle".format(total_interest / original_total))
