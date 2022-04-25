@@ -2,9 +2,9 @@ import loans
 from math import ceil
 
 if __name__ == "__main__":
-    initial_amount = 1500000
+    initial_amount = 33171 - 19500
     term = 360
-    apr = 3.425/ 100
+    apr = 3.75/ 100
 
     monthly_due = loans.annuity(initial_amount, apr=apr, months=term)
 

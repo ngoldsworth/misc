@@ -29,7 +29,7 @@ sl = sl[sl[:,1].argsort()]
 j = sl.shape[0] - 1
 while saved > 0:
     highest_interest_loan_amt = sl[j,0]
-    if highest_interest_loan_amt > saved:
+    if highest_interest_loan_amt < saved:
         saved = saved - highest_interest_loan_amt
         sl[j, 0] = 0
     else:
