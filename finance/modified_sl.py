@@ -37,10 +37,12 @@ if __name__ == '__main__':
 
 
     sl = sl[:j+1,:] # don't need paid off loans listed
+    print(sl)
 
     # start month counter
     m = 0
 
+    j = sl.shape[0] -1 
     while sl[:,0].sum() > 0:
         payment = monthly_payment
         # for each remainig loan, calculate the interest and pay the minimum payment
@@ -51,17 +53,14 @@ if __name__ == '__main__':
 
             payment -= min_pay #made the payment, those dollars come out of total
 
-        print(payment, j)
         while payment > 0 and j >= 0:
             #j is still indx for highest interest loan
             if(sl[j,0] >= payment):
                 sl[j,0] -= payment
-                print(sl[j,0])
                 payment = 0
             else:
                 payment -= sl[j,0]
                 sl[j,0] = 0
                 j =- 1
 
-        print(m, sl[:,0].sum())
         m += 1
