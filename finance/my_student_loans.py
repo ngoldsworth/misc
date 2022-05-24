@@ -1,17 +1,19 @@
+from regex import W
 import loans
 from math import ceil
 
 if __name__ == "__main__":
-    initial_amount = 1500000
-    term = 360
-    apr = 3.425/ 100
+    initial_amount = 5672 + 5672
+    term = 120
+    apr = (.0429 * 5672 + .0376 * 8363)/initial_amount
 
     monthly_due = loans.annuity(initial_amount, apr=apr, months=term)
+    print(apr)
 
     remaining = initial_amount
     original_total = monthly_due * term
 
-    monthly_actual = monthly_due * 1.5
+    monthly_actual = 1500 - 83.72
 
     m = 1
 

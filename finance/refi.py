@@ -11,25 +11,26 @@ def annuity(
     a /= (1 + i) ** months - 1
     return a
 
-saved = 19500
+saved = 19063
 
 # ALoan amount, and its interest rate
 student_loans = [
-    (5672, .0429), # 4.29% is .049
     (8363, .0376),
+    (5672, .0429), # 4.29% is .0429
     (8196, .0445),
+    (3020, .0453),
     (7920, .0505),
-    (3020, .0453)
 ]
+
 
 sl = np.asarray(student_loans)
 # sort by interest rate
 sl = sl[sl[:,1].argsort()]
-
+print(sl)
 j = sl.shape[0] - 1
 while saved > 0:
     highest_interest_loan_amt = sl[j,0]
-    if highest_interest_loan_amt > saved:
+    if highest_interest_loan_amt < saved:
         saved = saved - highest_interest_loan_amt
         sl[j, 0] = 0
     else:

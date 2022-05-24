@@ -116,7 +116,7 @@ class Loan():
         for j in range(self._term):
             interest_payment = remaining_principle * self._rate
             principle_payment = monthly_payment - interest_payment
-            remaining_principle -= monthly_payment
+            remaining_principle -= principle_payment
             amor_tab[j] = np.asarray([interest_payment, principle_payment, remaining_principle])
 
             print(interest_payment, principle_payment, remaining_principle)
