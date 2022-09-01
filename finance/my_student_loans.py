@@ -1,17 +1,10 @@
-from regex import W
 import loans
 from math import ceil
 
 if __name__ == "__main__":
-<<<<<<< HEAD
-    initial_amount = 5672 + 5672
-    term = 120
-    apr = (.0429 * 5672 + .0376 * 8363)/initial_amount
-=======
-    initial_amount = 33171 - 19500
-    term = 360
-    apr = 3.75/ 100
->>>>>>> b5246e292e192afdd863041a8555e633843065d5
+    initial_amount = 42000 - 19600
+    term = 72
+    apr = 7.31/ 100
 
     monthly_due = loans.annuity(initial_amount, apr=apr, months=term)
     print(apr)
@@ -19,7 +12,7 @@ if __name__ == "__main__":
     remaining = initial_amount
     original_total = monthly_due * term
 
-    monthly_actual = 1500 - 83.72
+    monthly_actual = 1000
 
     m = 1
 
@@ -68,6 +61,6 @@ if __name__ == "__main__":
         print(table_row)
 
     print( "Total Interest: {:>10.2f}".format( total_interest ))
-    print( "Interest is {:>4.2%} of total dolars paid".format(total_interest / total_paid))
+    print( "Interest is {:>4.2%} of total dollars paid".format(total_interest / total_paid))
 
     print( "and is      {:>4.2%} of  original principle".format(total_interest / original_total))
