@@ -168,8 +168,14 @@ if __name__ == '__main__':
     n = np.asarray([12,18,24,30,36,42,48,54,60,66,72])
 
    """ 
-    my_loan = Loan(10**6, .0043, 360)
-    fig, ax = my_loan.amortization_bar_plot(percent=True)
+    figs = []
+    loan_months = 72
+    for j in [1, 2, 3, 4, 5, 6, 7]:
+        my_loan = Loan(21000, j/1200, loan_months)
+        payment = my_loan.annuity()
+        fig1, ax1 = my_loan.amortization_bar_plot(percent=False)
+        ax1.set_title(f'{j}% APR on {loan_months} loan (${payment:.2f})')
+        figs.append((fig1, ax1))
     plt.show()
     
 
