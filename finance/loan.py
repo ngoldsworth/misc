@@ -130,15 +130,33 @@ class Loan:
 
         return amor_tab
 
-    def amortization_bar_plot(self):
+    def amortization_bar_plot(self,percent=False):
         fig, ax = plt.subplots()
 
         amor_tab = self.amortization_schedule()
         period = np.arange(self._term)
+<<<<<<< HEAD
         ax.bar(period, amor_tab[:, 1], label="Principle")
         ax.bar(period, amor_tab[:, 0], label="Interest")
+=======
+>>>>>>> 88fdb28266f04ad945e5e241c14fa5a039792305
 
-        ax.set_ylabel("Dollars")
+        i = amor_tab[:,0]
+        p = amor_tab[:,1]
+
+        if percent:
+            tot = i + p
+            i /= tot 
+            p /= tot
+
+        ax.bar(period, p, label="Principle",width=1)
+        ax.bar(period, i, label="Interest",width=1,bottom=p)
+
+        if percent:
+            ax.set_ylabel("Percents")
+        else:
+            ax.set_ylabel("Dollars")
+
         ax.set_xlabel("Period")
         ax.legend()
 
@@ -161,7 +179,19 @@ if __name__ == "__main__":
     i = np.linspace(start=2.49, stop=5, num=20)/100
     n = np.asarray([12,18,24,30,36,42,48,54,60,66,72])
 
+<<<<<<< HEAD
     """
     my_loan = Loan(10 ** 6, 0.003, 360)
     fig, ax = my_loan.amortization_bar_plot()
+=======
+   """ 
+    figs = []
+    loan_months = 72
+    for j in [1, 2, 3, 4, 5, 6, 7]:
+        my_loan = Loan(21000, j/1200, loan_months)
+        payment = my_loan.annuity()
+        fig1, ax1 = my_loan.amortization_bar_plot(percent=False)
+        ax1.set_title(f'{j}% APR on {loan_months} loan (${payment:.2f})')
+        figs.append((fig1, ax1))
+>>>>>>> 88fdb28266f04ad945e5e241c14fa5a039792305
     plt.show()

@@ -12,8 +12,12 @@ def annuity(
     a /= (1 + i) ** months - 1
     return a
 
+<<<<<<< HEAD
 
 saved = 10000
+=======
+saved = 0
+>>>>>>> 88fdb28266f04ad945e5e241c14fa5a039792305
 
 # ALoan amount, and its interest rate
 student_loans = [
