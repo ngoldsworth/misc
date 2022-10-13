@@ -2,11 +2,11 @@ from loans import annuity
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
-    loan = 10**6
+    loan = 10 ** 6
     factor = 4.0
     initial = loan
     term = 120
-    apr = 4/100
+    apr = 4 / 100
     j = 0
 
     payments = []
@@ -17,11 +17,11 @@ if __name__ == "__main__":
     total = 0
 
     while loan > 0:
-        loan += (loan * (apr/12))
+        loan += loan * (apr / 12)
 
         p = factor * annuity(loan, apr, term)
         payments.append(p)
-        payments_perc.append(p/initial)
+        payments_perc.append(p / initial)
 
         loan -= p
         owed.append(loan)
@@ -33,8 +33,8 @@ if __name__ == "__main__":
         total += p
 
         print("{:>3} Paid: {:>8.2f} | Owed: {:>8.2f}".format(j, p, loan))
-    
-    print(total/initial)
+
+    print(total / initial)
 
     fig, ax = plt.subplots(1, 1)
     ax.plot(payments)
