@@ -9,6 +9,17 @@ from prettytable.prettytable import PLAIN_COLUMNS
 
 # TODO: add a way/method that makes sense for doing payments that go to only principle
 #       probably via some Payment type object
+class Payment:
+    """
+    Helper class
+    GLorified struct with some helpful methods
+    :param pay_principle: amount of money spent directly on the principle
+    :param pay_interest: amount of money spent on interest
+    """
+
+    def __init__(self, pay_principle: float, pay_interest: float):
+        self._pay_principle = pay_principle
+        self._pay_interest = pay_interest
 
 
 class Loan:
@@ -41,6 +52,8 @@ class Loan:
     @property
     def remaining_balance(self):
         return self._current_balance
+    def rate(self):
+        return self._rate
 
     def annuity(self, principle=None, rate=None, term=None):
         """Calculates per-period payment for a given loan. Unless otherwise
@@ -92,6 +105,9 @@ class Loan:
         if amount < self.minimum_payment():
             raise ValueError("Too small a payment")
 
+        interest = self._rate * self._current_balance
+        self._current_balance += interest - amount
+
         if not principle_only:
             interest = self._rate * self._current_balance
             self._current_balance += interest - amount
@@ -131,6 +147,8 @@ class Loan:
 
         amor_tab = self.amortization_schedule()
         period = np.arange(self._term)
+        ax.bar(period, amor_tab[:, 1], label="Principle")
+        ax.bar(period, amor_tab[:, 0], label="Interest")
 
         i = amor_tab[:, 0]
         p = amor_tab[:, 1]
@@ -155,22 +173,6 @@ class Loan:
 
 
 if __name__ == "__main__":
-    """
-    locale.setlocale(locale.LC_ALL, '')
-    starting_savings = 7000
-    monthly_rates = np.asarray([500, 600, 700, 750, 800, 1000])
-    save_time = 1 # months after Feb 1, 2022
-    cost = 28000 # brand new Tacoma cost 2021
-
-
-    saved = starting_savings + (save_time * monthly_rates)
-    loans = cost - saved
-
-    # interest
-    i = np.linspace(start=2.49, stop=5, num=20)/100
-    n = np.asarray([12,18,24,30,36,42,48,54,60,66,72])
-
-    """
     figs = []
     loan_months = 72
     for j in [1, 2, 3, 4, 5, 6, 7]:

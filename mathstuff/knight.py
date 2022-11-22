@@ -95,13 +95,13 @@ class RectangularSpiralBoard:
         return
 
     def diag_ur(self, n):
-        return 4 * (n**2) - 2 * n + 1
+        return 4 * (n ** 2) - 2 * n + 1
 
     def diag_ul(self, n):
         return (2 * n) ** 2 + 1
 
     def diag_dl(self, n):
-        return 4 * (n**2) + (2 * n) + 1
+        return 4 * (n ** 2) + (2 * n) + 1
 
     def diag_dr(self, n):
         return (2 * n + 1) ** 2

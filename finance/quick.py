@@ -2,7 +2,7 @@ from loans import annuity
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
-    loan = 10**6
+    loan = 10 ** 6
     factor = 4.0
     initial = loan
     term = 120
