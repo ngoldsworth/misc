@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from sympy.utilities.iterables import partitions
 from sympy.functions.combinatorial.numbers import stirling
 
+
 def multinomial_coefficient(n: int, k: t.List[int]) -> int:
     num = math.factorial(n)
 
@@ -100,27 +101,30 @@ def partitions_generator(n, k=None):
         yield ms
 
 
-def partition_to_list(partition:dict)->list:
+def partition_to_list(partition: dict) -> list:
     lst = []
     for k in partition:
         for j in range(partition[k]):
             lst.append(k)
-    
+
     return lst
 
-def partition_number_of_parts(partition:dict)->int:
+
+def partition_number_of_parts(partition: dict) -> int:
     count = 0
     for k in partition:
         count += partition[k]
-    
+
     return count
 
-def repeat_count(partition:dict)->int:
+
+def repeat_count(partition: dict) -> int:
     r = 1
     for k in partition:
-        r *= math.factorial(partition[k]) 
-    
+        r *= math.factorial(partition[k])
+
     return r
+
 
 def g(digit_count: int, base: int, partition: dict):
 
@@ -134,27 +138,33 @@ def g(digit_count: int, base: int, partition: dict):
 
     # a four-digit number with three 2 unique digits can be written "ABAB", "AABB" "BABA" "BBAA"...
     # there are multiple qays to arrange repeated values
-    arrangement_coeff = multinomial_coefficient(digit_count, partition_to_list(partition))
+    arrangement_coeff = multinomial_coefficient(
+        digit_count, partition_to_list(partition)
+    )
 
     # In a 6 digit number, the pattern "AAABBB" and "BBBAAA" describe the same set of numbers, divide by 2!
     # "AABBCC" and "BBAACC" and "CCBBAA"... describe te same set of numbers, divide by 6 = 3!
-    # do this division since acounting for A={1..9}, B={1..9, != A} done in 
+    # do this division since acounting for A={1..9}, B={1..9, != A} done in
     repeat_divisor = repeat_count(partition)
 
     return assign_digits * arrangement_coeff / repeat_divisor
     # return arrangement_coeff * assign_digits
 
 
-def h(num_digits, base, unique_digits)->int:
+def h(num_digits, base, unique_digits) -> int:
     if unique_digits > base:
-        raise ValueError("Can't have more unique digits than number of possible distinct digits (the base)")
+        raise ValueError(
+            "Can't have more unique digits than number of possible distinct digits (the base)"
+        )
     elif unique_digits == base:
         return stirling(num_digits, unique_digits)
     else:
         return math.perm(base, unique_digits) * stirling(num_digits, unique_digits)
-    
+
+
 def unique_perms(series):
-    return{"".join(p) for p in itertools.permutations(series)}
+    return {"".join(p) for p in itertools.permutations(series)}
+
 
 def next_permutation(seq, pred=cmp):
     """Like C++ std::next_permutation() but implemented as
@@ -168,11 +178,11 @@ def next_permutation(seq, pred=cmp):
             return
         while True:
             seq[start], seq[end] = seq[end], seq[start]
-            if start == end or start+1 == end:
+            if start == end or start + 1 == end:
                 return
             start += 1
             end -= 1
-    
+
     if not seq:
         raise StopIteration
 
@@ -188,7 +198,7 @@ def next_permutation(seq, pred=cmp):
     # Yield input sequence as the STL version is often
     # used inside do {} while.
     yield seq
-    
+
     if last == 1:
         raise StopIteration
 
@@ -199,14 +209,14 @@ def next_permutation(seq, pred=cmp):
             # Step 1.
             next1 = next
             next -= 1
-            
+
             if pred(seq[next], seq[next1]) < 0:
                 # Step 2.
                 mid = last - 1
                 while not (pred(seq[next], seq[mid]) < 0):
                     mid -= 1
                 seq[next], seq[mid] = seq[mid], seq[next]
-                
+
                 # Step 3.
                 reverse(seq, next1, last)
 
@@ -219,16 +229,17 @@ def next_permutation(seq, pred=cmp):
     raise StopIteration
 
 
-def cooper_kennedy_coding(series: list)->tuple:
+def cooper_kennedy_coding(series: list) -> tuple:
     d = {}
-    pattern = [] 
+    pattern = []
 
     for i, ch in enumerate(series):
         if ch not in d:
             d[ch] = i
         pattern.append(d[ch])
-    
+
     return tuple(pattern)
+
 
 def num_unique_ck_codings(series: list):
     unq = list(unique_perms(series))
@@ -236,16 +247,15 @@ def num_unique_ck_codings(series: list):
     ck_list = []
     for perm in unq:
         ck_list.append(cooper_kennedy_coding(perm))
-    
-    return len(set(ck_list))
 
+    return len(set(ck_list))
 
 
 if __name__ == "__main__":
     base = 6  # try for hexadecimal later
     num_digits = 6  # total number of digits in the number
 
-    k = []    
+    k = []
     lst0 = []
     lst1 = []
 
@@ -265,7 +275,11 @@ if __name__ == "__main__":
     # # plt.show()
 
     base_patterns = [
-        "AABB", "AABBC", "AABBCC", "AABBCD", "AAABBB",
+        "AABB",
+        "AABBC",
+        "AABBCC",
+        "AABBCD",
+        "AAABBB",
         "AABBCDD",
         "AABBCDDEE",
     ]
@@ -279,12 +293,12 @@ if __name__ == "__main__":
     #     s = "{:>11}: {:>4} / {:>4} = {:>4}".format(pat, n_perms, n_ck, n_perms/n_ck)
     #     print(s)
 
-    fig, ax = plt.subplots(1,1)
+    fig, ax = plt.subplots(1, 1)
     for j in range(30):
         k.append(j)
-        lst0.append(stirling(j, j//2))
-        lst1.append(stirling(j, j//2 + 3))
+        lst0.append(stirling(j, j // 2))
+        lst1.append(stirling(j, j // 2 + 3))
     ax.plot(k, lst0)
     ax.plot(k, lst1)
-    ax.set_yscale('log')
+    ax.set_yscale("log")
     plt.show()
