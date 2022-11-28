@@ -7,6 +7,8 @@ import prettytable
 from prettytable.prettytable import PLAIN_COLUMNS
 
 
+# TODO: add a way/method that makes sense for doing payments that go to only principle
+#       probably via some Payment type object
 class Payment:
     """
     Helper class
@@ -48,6 +50,8 @@ class Loan:
         return self._term - self._period_idx
 
     @property
+    def remaining_balance(self):
+        return self._current_balance
     def rate(self):
         return self._rate
 
@@ -90,7 +94,7 @@ class Loan:
     def minimum_payment(self):
         return self.annuity(self._current_balance, self._rate, self.remaining_periods)
 
-    def make_payment(self, amount=None):
+    def make_payment(self, amount=None, principle_only=False):
         """
         Progress the loan forward in its life one period. Raises value error if
         `amount` is smaller than the minimum on the remaining life of the loan.
@@ -104,9 +108,17 @@ class Loan:
         interest = self._rate * self._current_balance
         self._current_balance += interest - amount
 
-        self._interest.append(interest)
-        self._payments.append(amount)
-        self._period_idx += 1
+        if not principle_only:
+            interest = self._rate * self._current_balance
+            self._current_balance += interest - amount
+
+            self._interest.append(interest)
+            self._payments.append(amount)
+            self._period_idx += 1
+
+        else:
+            self._current_balance -= amount
+            self._payments[-1] += amount
 
     def amortization_schedule(self) -> np.ndarray:
         """
@@ -130,7 +142,7 @@ class Loan:
 
         return amor_tab
 
-    def amortization_bar_plot(self,percent=False):
+    def amortization_bar_plot(self, percent=False):
         fig, ax = plt.subplots()
 
         amor_tab = self.amortization_schedule()
@@ -138,16 +150,16 @@ class Loan:
         ax.bar(period, amor_tab[:, 1], label="Principle")
         ax.bar(period, amor_tab[:, 0], label="Interest")
 
-        i = amor_tab[:,0]
-        p = amor_tab[:,1]
+        i = amor_tab[:, 0]
+        p = amor_tab[:, 1]
 
         if percent:
             tot = i + p
-            i /= tot 
+            i /= tot
             p /= tot
 
-        ax.bar(period, p, label="Principle",width=1)
-        ax.bar(period, i, label="Interest",width=1,bottom=p)
+        ax.bar(period, p, label="Principle", width=1)
+        ax.bar(period, i, label="Interest", width=1, bottom=p)
 
         if percent:
             ax.set_ylabel("Percents")
@@ -161,28 +173,12 @@ class Loan:
 
 
 if __name__ == "__main__":
-    """
-    locale.setlocale(locale.LC_ALL, '')
-    starting_savings = 7000
-    monthly_rates = np.asarray([500, 600, 700, 750, 800, 1000])
-    save_time = 1 # months after Feb 1, 2022
-    cost = 28000 # brand new Tacoma cost 2021
-
-
-    saved = starting_savings + (save_time * monthly_rates)
-    loans = cost - saved
-
-    # interest
-    i = np.linspace(start=2.49, stop=5, num=20)/100
-    n = np.asarray([12,18,24,30,36,42,48,54,60,66,72])
-
-   """ 
     figs = []
     loan_months = 72
-    for j in [3.9]:
-        my_loan = Loan(24484, j/1200, loan_months)
+    for j in [1, 2, 3, 4, 5, 6, 7]:
+        my_loan = Loan(21000, j / 1200, loan_months)
         payment = my_loan.annuity()
         fig1, ax1 = my_loan.amortization_bar_plot(percent=False)
-        ax1.set_title(f'{j}% APR on {loan_months} loan (${payment:.2f})')
+        ax1.set_title(f"{j}% APR on {loan_months} loan (${payment:.2f})")
         figs.append((fig1, ax1))
     plt.show()

@@ -53,7 +53,7 @@ def extra_payoff_table(term: int, apr: np.ndarray, extras_percent: np.ndarray):
     @param apr: array of APR's
     @param extras_percent: extra as <1 percentage of payment.
     """
-    original = 10 ** 6
+    original = 10**6
 
     headers = "{:>8} |".format(" ")
     for rate in apr:

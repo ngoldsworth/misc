@@ -3,7 +3,7 @@ import numpy as np
 
 digits = 6
 sml = 10 ** (digits - 1)
-lrg = (10 ** digits) - 1
+lrg = (10**digits) - 1
 
 counts = [0] * digits
 
