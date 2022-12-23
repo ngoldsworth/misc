@@ -126,7 +126,7 @@ class Loan:
         """
         amor_tab = np.empty((self._term, 3), dtype=float)
         monthly_payment = self.annuity()
-        print(monthly_payment)
+        # print(monthly_payment)
 
         remaining_principle = self._original_principle
 
@@ -138,7 +138,7 @@ class Loan:
                 [interest_payment, principle_payment, remaining_principle]
             )
 
-            print(interest_payment, principle_payment, remaining_principle)
+            # print(interest_payment, principle_payment, remaining_principle)
 
         return amor_tab
 
