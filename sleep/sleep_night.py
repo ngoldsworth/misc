@@ -15,6 +15,9 @@ import matplotlib.pyplot as plt
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 
 
+## To get credentials: need to log into Google Cloud and find the OAuth 2.0 Client ID.
+## Download the JSON.
+
 def _get_creds():
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
