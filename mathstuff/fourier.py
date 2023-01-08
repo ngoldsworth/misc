@@ -3,7 +3,8 @@ import numpy as np
 import scipy.fft
 
 n = 10**4
-x = np.linspace(0, 1000, n)
+x = np.zeros(n)
+x[1:7] = 1
 k = 10
 
 idx = np.arange(x.size)
