@@ -302,6 +302,14 @@ class SleepNights(Sequence):
             sleep_quality=self._sleep_quality[index],
         )
 
+    def _relative_to_midnight(self, t):
+        return (t - self.date)/60
+
+    def mean_time(self, t):
+        minutes = self._relative_to_midnight(t)
+        # TODO: decide how to handle mean hour
+        
+
     @property
     def date(self):
         return self._date
@@ -361,6 +369,30 @@ class SleepNights(Sequence):
     def sleep_duration(self, unit='m'):
         return (self.time_final_awakening - self.time_try_to_sleep) / np.timedelta64(1, unit)
 
+    def hist_sleep_qual(self,):
+        d = self.sleep_duration('h')
+        fig, ax = plt.subplots(1)
+
+        # num of unique values in sleep quality array
+        u = np.unique(self.sleep_quality)
+        colors = ['red', 'orange', 'yellow', 'green', 'blue']
+
+        e = np.histogram_bin_edges(d)
+        e_centers = (e[:-1] + e[1:])/2
+        top=None
+
+        for i, ui in enumerate(u):
+            subset = d[self.sleep_quality==ui]
+            h, e = np.histogram(subset, bins=e)
+            ax.bar(e_centers, h, bottom=top, label=str(ui), color=colors[i])
+            if top is None:
+                top = h
+            else:
+                top += h
+
+        ax.legend()
+        return fig, ax
+
 if __name__ == "__main__":
     import pickle
     import pathlib as pl
@@ -383,36 +415,7 @@ if __name__ == "__main__":
         o = open(pkl_file, 'rb')
         sn = pickle.load(o)
 
-    # plt.hist(sn.sleep_quality, bins=[0.5, 1.5, 2.5, 3.5, 4.5, 5.5])
-    # plt.show()
-    d = sn.sleep_duration('h')
-    # plt.plot(sn.sleep_quality, d, 'o')
-    # plt.show()
 
-    fig, ax = plt.subplots(1)
+    print(sn._relative_to_midnight(sn.time_final_awakening))
 
-    # edges
-    
-    # num of unique values in sleep quality array
-    u = np.unique(sn.sleep_quality)
-    colors = ['red', 'orange', 'yellow', 'green', 'blue']
-
-    e = np.histogram_bin_edges(d)
-    top=None
-    e_centers = (e[:-1] + e[1:])/2
-
-    for i, ui in enumerate(u):
-        subset = d[sn.sleep_quality==ui]
-        h, e = np.histogram(subset, bins=e)
-        ax.bar(e_centers, h, bottom=top, label=str(ui), color=colors[i])
-
-        if top is None:
-            top = h
-        else:
-            top += h
-
-        print(top)
-    
-    ax.legend()
-    plt.show()
-    print(e_centers)
+    print(np.mean(sn.sleep_duration())/60)
