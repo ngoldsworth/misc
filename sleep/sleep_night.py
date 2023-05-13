@@ -1,6 +1,7 @@
 from collections.abc import Sequence
 import datetime
 import os.path
+import re
 
 import numpy as np
 
@@ -10,6 +11,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
@@ -185,14 +187,35 @@ class SleepNights(Sequence):
 
         return np.datetime64(d.isoformat())
 
-    # def _minutes_rel_midnight(t):
-    #     pass
+    def _to_rel_mdate(self, d:str, t:str):
+        """Helper function, converts HH:MM timestamp to relative to midnight.
+        Assumes an HH>=12 is before mightnight (PM), and an HH<12 is after midnight (AM)"""
+
+        if t == '':
+            return np.NaN
+
+        d = mdates.num2date(d)
+
+        m = re.search(r'(\d+):(\d+)', t)
+        hour, minute = int(m[1]), int(m[2])
+        ds = f'{d} {t}'
+        midnight = mdates.datestr2num(f'{d} 00:00')
+        if hour >= 12:
+            mt = mdates.datestr2num(ds) - 1
+        else:
+            mt = mdates.datestr2num(ds)
+        
+        return mt - midnight
+    
+    def _to_mdate(self, d:str, t:str):
+        return mdates.datestr2num(f'{d} {t}')
 
     def get_sheets_data(
-        self,
-        spreadsheet_id,
-        range_name,
-    ):
+            self,
+            spreadsheet_id,
+            range_name
+            ):
+
         creds = _get_creds()
         try:
             service = build("sheets", "v4", credentials=creds)
@@ -207,79 +230,78 @@ class SleepNights(Sequence):
                 )
                 .execute()
             )
-            cols = result.get("values", [])
+            data_cols = result.get("values", [])
         except HttpError as error:
             print(f"An error occurred: {error}")
             return error
 
         # in sheet, column A (idx 0) is date
-        self._date = np.array(cols[0], dtype="datetime64[D]")
-
+        night = [mdates.datestr2num(n) for n in data_cols[0]]
+        self._date = np.asarray(night)
         # set the length
         self._length = len(self._date)
 
         # in sheet, column B (idx 1) is "What time did you get into bed"
         self._time_into_bed = np.array(
-            [self._to_npdatetime(d, t) for d, t in zip(self.date, cols[1])],
-            dtype="datetime64",
+            [self._to_rel_mdate(d, t) for d, t in zip(self.date, data_cols[1])]
         )
 
         # in sheet, column C (idx 2) is "What time did you try to get to sleep"
         self._time_try_to_sleep = np.array(
-            [self._to_npdatetime(d, t) for d, t in zip(self.date, cols[2])],
-            dtype="datetime64",
+            [self._to_rel_mdate(d, t) for d, t in zip(self.date, data_cols[2])]
         )
 
         # in sheet, column D (idx 3) is "What time was your final awakening?"
         self._time_final_awakening = np.array(
-            [self._to_npdatetime(d, t) for d, t in zip(self.date, cols[3])],
-            dtype="datetime64",
+            [self._to_rel_mdate(d, t) for d, t in zip(self.date, data_cols[3])],
         )
 
         # column E (idx 4)
         self._time_out_of_bed = np.array(
-            [self._to_npdatetime(d, t) for d, t in zip(self.date, cols[4])],
-            dtype="datetime64",
+            [self._to_rel_mdate(d, t) for d, t in zip(self.date, data_cols[4])],
         )
 
         # column F (idx 5)
         self._minutes_to_fall_asleep = np.asarray(
-            [self._val_convert(val) for val in cols[5]]
+            [self._val_convert(val) for val in data_cols[5]]
         )
 
         # column G (idx 6)
-        self._wake_up_count = np.asarray([self._val_convert(val) for val in cols[6]])
+        self._wake_up_count = np.asarray([self._val_convert(val) for val in data_cols[6]])
 
         # column H (idx 7)
-        self._wake_ups_duration_minutes = [self._val_convert(val) for val in cols[7]]
+        self._wake_ups_duration_minutes = [self._val_convert(val) for val in data_cols[7]]
 
         # column I (idx 8)
         self._time_smartwatch_fell_asleep = np.array(
-            [self._to_npdatetime(d, t) for d, t in zip(self.date, cols[8])],
-            dtype="datetime64",
+            [self._to_rel_mdate(d, t) for d, t in zip(self.date, data_cols[8])]
         )
 
         # column J (idx 9)
         self._time_smartwatch_wakeup = np.array(
-            [self._to_npdatetime(d, t) for d, t in zip(self.date, cols[9])],
-            dtype="datetime64",
+            [self._to_rel_mdate(d, t) for d, t in zip(self.date, data_cols[9])]
         )
 
         # column K (idx 10)
         self._smartwatch_wake_ups_duration_minutes = np.asarray(
-            [self._val_convert(val) for val in cols[10]]
+            [self._val_convert(val) for val in data_cols[10]]
         )
 
         # column L (idx 11)
-        self._sleep_quality = np.asarray([self._val_convert(val) for val in cols[11]])
+        self._sleep_quality = np.asarray([self._val_convert(val) for val in data_cols[11]])
 
         # column M (idx 12)
-        self._rested = np.asarray(self._val_convert(val) for val in cols[12])
+        self._rested = np.asarray(self._val_convert(val) for val in data_cols[12])
 
         #column N (idx 13)
-        self._comments = [c for c in cols[13]]
+        self._comments = [c for c in data_cols[13]]
 
         return
+
+
+        # any TIMES in the spreadsheet, save them as a number relative to the beginning time of the date
+        # ie, June 6 at 10pm will be saved as -2 hours, relative to midnight at the start of June 7
+
 
     def __len__(self):
         return self._length
@@ -301,14 +323,6 @@ class SleepNights(Sequence):
             ],
             sleep_quality=self._sleep_quality[index],
         )
-
-    def _relative_to_midnight(self, t):
-        return (t - self.date)/60
-
-    def mean_time(self, t):
-        minutes = self._relative_to_midnight(t)
-        # TODO: decide how to handle mean hour
-        
 
     @property
     def date(self):
@@ -367,7 +381,16 @@ class SleepNights(Sequence):
         return self._comments
 
     def sleep_duration(self, unit='m'):
-        return (self.time_final_awakening - self.time_try_to_sleep) / np.timedelta64(1, unit)
+        # get_sheets_data2 returns all times in units of 1 day (in matplotlib.dates 1.0 = 1 day)
+        match unit:
+            case 'm':
+                multiplier = 24 * 60
+            case 'h':
+                multiplier = 24
+            case 's':
+                multiplier = 24 * 60 * 60
+
+        return (self.time_final_awakening - self.time_try_to_sleep)  * multiplier
 
     def hist_sleep_qual(self,):
         d = self.sleep_duration('h')
@@ -393,6 +416,132 @@ class SleepNights(Sequence):
         ax.legend()
         return fig, ax
 
+    def plt_nightly_duration(self):
+        fig, ax = plt.subplots(1,1)
+        ax.plot(self.date, self.sleep_duration(unit='h'),'o')
+
+        ax.xaxis.set_major_locator(mdates.AutoDateLocator())
+        ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
+
+        ax.set_title('Sleep duration')
+        ax.set_xlabel('Night')
+        ax.set_ylabel('Hours slept')
+
+        return fig, ax
+
+    def plt_nightly_sleep_wake(self):
+        x = self.date
+        y0 = self.time_try_to_sleep
+        y1 = self.time_final_awakening
+
+        fig, ax = plt.subplots(1,1)
+        ax.vlines(x, y0, y1, 'k')
+        ax.plot(x, y0, 'o', label='Fell asleep')
+        ax.plot(x, y1, 'o', label='Final wake')
+
+        # date formating on axes ticks
+        ax.xaxis.set_major_locator(mdates.MonthLocator())
+        ax.xaxis.set_major_formatter( mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
+
+        formatter = mdates.DateFormatter('%H:%M')
+        ax.yaxis.set_major_locator(mdates.AutoDateLocator())
+        ax.yaxis.set_major_formatter(formatter)
+        ax.invert_yaxis()
+
+        ax.set_xlabel('Night')
+        ax.set_ylabel('Time of night')
+        ax.set_title('Nightly sleep/wake times')
+        ax.legend()
+        
+        return fig, ax
+
+    def plt_nightly_times(
+            self,
+            time_try_to_sleep:bool=True,
+            time_final_awakening:bool=True,
+            time_into_bed:bool=True,
+            time_out_of_bed:bool=True,
+            time_middle_sleep:bool=True,
+            ):
+
+        x = self.date
+
+        time_lst = []
+        labels = []
+
+        if time_into_bed:
+            time_lst.append(self.time_into_bed)
+            labels.append('Got into bed')
+
+        if time_try_to_sleep:
+            time_lst.append(self.time_try_to_sleep)
+            labels.append('Tried to sleep')
+
+        if time_middle_sleep:
+            m = (self.time_final_awakening + self.time_try_to_sleep)/2
+            labels.append('middle of sleep')
+            time_lst.append(m)
+
+        if time_final_awakening:
+            time_lst.append(self.time_final_awakening)
+            labels.append('Final awakening')
+
+        if time_out_of_bed:
+            time_lst.append(self.time_out_of_bed)
+            labels.append('Got out of bed')
+
+        fig, ax = plt.subplots(1,1)
+
+        if len(time_lst):
+            tmaxs = np.maximum.reduce(time_lst)
+            tmins = np.minimum.reduce(time_lst)
+            ax.vlines(x, tmins, tmaxs, 'k')
+
+        for lbl,times in zip(labels, time_lst):
+            ax.plot(x, times, 'o', label=lbl)
+
+        # date formating on axes ticks
+        ax.xaxis.set_major_locator(mdates.MonthLocator())
+        ax.xaxis.set_major_formatter( mdates.ConciseDateFormatter(ax.xaxis.get_major_locator()))
+
+        formatter = mdates.DateFormatter('%H:%M')
+        ax.yaxis.set_major_locator(mdates.AutoDateLocator())
+        ax.yaxis.set_major_formatter(formatter)
+        ax.invert_yaxis()
+
+        ax.set_xlabel('Night')
+        ax.set_ylabel('Time of night')
+        ax.legend()
+
+        return fig, ax
+
+    def plt_prob_asleep(self, normalize=True):
+        s = self.time_try_to_sleep
+        w = self.time_final_awakening
+        tmin = min(s.min(), w.min())
+        tmax = max(s.max(), w.max())
+
+        t = np.linspace(tmin, tmax, num=100)
+        n = np.zeros(t.size)
+
+        for si, wi in zip(s, w):
+            n += np.logical_and(t > si, t < wi)
+
+        if normalize:
+            n /= s.size
+
+        fig, ax = plt.subplots(1,1)
+
+        ax.plot(t, n)
+
+        formatter = mdates.DateFormatter('%H:%M')
+        ax.xaxis.set_major_locator(mdates.HourLocator())
+        ax.xaxis.set_major_formatter(formatter)
+
+        return fig, ax
+
+
+
 if __name__ == "__main__":
     import pickle
     import pathlib as pl
@@ -406,7 +555,7 @@ if __name__ == "__main__":
     if not pkl_file.exists():
         print('downloading data')
         sn.get_sheets_data(spreadsheet_id, sheetrange)
-        print(sn)
+        # print(sn)
         # o = open(pkl_file, 'wb')
         # print('writing pickle')
         # pickle.dump(sn, o)
@@ -415,7 +564,7 @@ if __name__ == "__main__":
         o = open(pkl_file, 'rb')
         sn = pickle.load(o)
 
+    # fig,ax = sn.plt_nightly_times()
+    f2, a2 = sn.plt_prob_asleep()
 
-    print(sn._relative_to_midnight(sn.time_final_awakening))
-
-    print(np.mean(sn.sleep_duration())/60)
+    plt.show()
