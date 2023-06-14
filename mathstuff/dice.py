@@ -124,9 +124,9 @@ def monoExp(x, m, t, b):
     return m * np.exp(-t * x) + b
 
 if __name__ == '__main__':
-    rolls = 128
-    # die_sizes = [4, 6, 10,20]
-    die_sizes = np.arange(6,100)
+    rolls = 100
+    die_sizes = [2, 4,6]
+    # die_sizes = np.arange(6,15)
     fig, ax = plt.subplots(1,1)
 
     lo = []
@@ -136,31 +136,31 @@ if __name__ == '__main__':
         p, b, u, s = dice_hist_optimized(rolls, n, stats=True)
         # p, b, u, s = dice_hist(rolls, n, stats=True)
         p /= p.sum()
-        xlo = int(np.floor(u-s))
-        lo.append((xlo, p[xlo]))
+        # xlo = int(np.floor(u-s))
+        # lo.append((xlo, p[xlo]))
 
         xu = u
         mid.append((xu, max(p)))
 
-        xhi = int(np.floor(u+s))
-        hi.append((xhi, p[xhi]))
+        # xhi = int(np.floor(u+s))
+        # hi.append((xhi, p[xhi]))
 
-        # if not (n % 7):
-            # ax.bar(b, p, width=1, label='{}: u={:>5.4}, s={:>5.4}'.format(n, u, s), alpha=0.7)
-        # ax.plot(b, p/p.sum(), '-o', label='{}: u={:>5.4}, s={:>5.4}'.format(n, u, s))
-    lo = np.asarray(lo).T
-    hi = np.asarray(hi).T
+        # if not (n % 2)+1:
+        # ax.bar(b, p, width=1, label='{}: u={:>5.4}, s={:>5.4}'.format(n, u, s), alpha=0.7)
+        ax.plot(b, p/p.sum(), '-', label='{}: u={:>5.4}, s={:>5.4}'.format(n, u, s))
+    # lo = np.asarray(lo).T
+    # hi = np.asarray(hi).T
     mid = np.asarray(mid).T
 
     x_exp = mid[0]
     y_exp = mid[1]
     # ax.plot(lo[0], lo[1], '-o', label='u-s')
     # ax.plot(hi[0], hi[1], '-o', label='u+s')
-    ax.plot(x_exp, y_exp, '-o', label='u')
+    # ax.plot(x_exp, y_exp, '-o', label='u')
     ax.legend()
     ax.set_title('{} rolls'.format(rolls))
 
-    popt, pcov = curve_fit(monoExp,  x_exp, y_exp)
-    print(popt)
+    # popt, pcov = curve_fit(monoExp,  x_exp, y_exp)
+    # print(popt)
 
     plt.show()
