@@ -98,7 +98,7 @@ class SingleSleepNight:
 
     @property
     def date_evening(self):
-        return self.date_morning-1
+        return self.date_morning - 1
 
     @property
     def time_into_bed(self):
@@ -194,7 +194,7 @@ class SleepNights(Sequence):
         self._smartwatch_wake_ups_duration_minutes = np.asarray(
             [s.smartwatch_wake_ups_duration for s in seq]
         )
-        self._comments=[s.comment for s in seq]
+        self._comments = [s.comment for s in seq]
 
     # this is a hack, because I want to pickle
     # def to_single_sleep_night_list(self):
@@ -265,9 +265,17 @@ class SleepNights(Sequence):
         return mdates.datestr2num(f"{d} {t}")
 
     @staticmethod
-    def _mdate_to_hour_decimal(t):
+    def _mdate_to_hour_decimal(t, convert_mod_24=False):
+        """
+        if `convert_mod_24`, times in the morning will have 24 added to them. E.g, 6:15am becomes 30.25
+        """
         d = mdates.num2date(t)
-        return d.hour + (d.minute / 60)
+        out = d.hour + (d.minute / 60)
+
+        if d.hour < 12:
+            out += 24
+
+        return out
 
     def to_soca_format_csv(self, csvfile: pl.Path):
         headers = [
@@ -278,7 +286,7 @@ class SleepNights(Sequence):
             "time tried to sleep",
             "final awakening",
             "got out of bed",
-            "how long it took to fall asleep (minutes)" ,
+            "how long it took to fall asleep (minutes)",
             "how many times woke up",
             "duration of awakenings",
             "perceived quality of sleep (1 to 5)",
@@ -296,23 +304,27 @@ class SleepNights(Sequence):
             6: "Sunday",
         }
 
-        with open(csvfile, "w", newline='') as fp:
-            csv_writer = csv.writer(fp, dialect='excel')
+        with open(csvfile, "w", newline="") as fp:
+            csv_writer = csv.writer(fp, dialect="excel")
             # fp.write(",".join(headers) + "\n")
             csv_writer.writerow(headers)
 
             for ssn in self:
                 evening = mdates.num2date(ssn.date_evening)
+                morning = mdates.num2date(ssn.date_morning)
 
                 row = []
                 row.append(f"{evening.year:>04}-{evening.month:>02}-{evening.day:>02}")
-                row.append(f"{evening.year:>04}-{evening.month:>02}-{evening.day+1:>02}")
+                row.append(f"{morning.year:>04}-{morning.month:>02}-{morning.day:>02}")
                 row.append(f"{weekday_map[evening.weekday()]}")
 
-                row.append(f"{self._mdate_to_hour_decimal(ssn.time_into_bed):.2f}")
-                row.append(f"{self._mdate_to_hour_decimal(ssn.time_try_to_sleep):.2f}")
-                row.append(f"{self._mdate_to_hour_decimal(ssn.time_final_awakening):.2f}")
-                row.append(f"{self._mdate_to_hour_decimal(ssn.time_out_of_bed):.2f}")
+                for dec_time in ( ssn.time_into_bed, ssn.time_try_to_sleep, ssn.time_final_awakening, ssn.time_out_of_bed,):
+                    row.append(f"{self._mdate_to_hour_decimal(dec_time, convert_mod_24=True):.2f}")
+
+                # row.append(f"{dec_into_bed:.2f}")
+                # row.append(f"{dec_try_sleep:.2f}")
+                # row.append(f"{dec_final_wake:.2f}")
+                # row.append(f"{dec_out_of_bed:.2f}")
                 row.append(f"{ssn.time_to_fall_asleep}")
                 row.append(f"{ssn.wake_up_count}")
                 row.append(f"{ssn.wake_ups_duration}")
@@ -320,8 +332,6 @@ class SleepNights(Sequence):
                 row.append(f"{ssn.comment}")
 
                 csv_writer.writerow(row)
-
-                
 
     def get_sheets_data(self, spreadsheet_id, range_name):
         creds = _get_creds()
@@ -506,7 +516,7 @@ class SleepNights(Sequence):
                 index
             ],
             sleep_quality=self._sleep_quality[index],
-            comment=self._comments[index]
+            comment=self._comments[index],
         )
 
     def __iter__(self):
@@ -519,23 +529,26 @@ class SleepNights(Sequence):
 
     @property
     def date_evening(self):
-        return self.date_morning-1
+        return self.date_morning - 1
 
     def weeknight(self, include_sundays=True):
-        day_of_week = np.asarray([w.weekday() for w in mdates.num2date(sn.date_evening)])
-        # for datetime.date.weekday, 0 is monday, sunday is 6 
+        day_of_week = np.asarray(
+            [w.weekday() for w in mdates.num2date(sn.date_evening)]
+        )
+        # for datetime.date.weekday, 0 is monday, sunday is 6
         # Monday thru Thurs is 0, 1, 2, 3
         weeknight_idx = day_of_week < 4
 
         if include_sundays:
-            weeknight_idx = np.logical_or(weeknight_idx, day_of_week==6)
+            weeknight_idx = np.logical_or(weeknight_idx, day_of_week == 6)
 
-        return weeknight_idx    
+        return weeknight_idx
 
     def weekend_night(self):
-        day_of_week = np.asarray([w.weekday() for w in mdates.num2date(sn.date_evening)])
-        return np.logical_or(day_of_week==4, day_of_week==5)
-
+        day_of_week = np.asarray(
+            [w.weekday() for w in mdates.num2date(sn.date_evening)]
+        )
+        return np.logical_or(day_of_week == 4, day_of_week == 5)
 
     @property
     def time_into_bed(self):
@@ -601,50 +614,37 @@ class SleepNights(Sequence):
 
         return (self.time_final_awakening - self.time_try_to_sleep) * multiplier
 
-    def time_seq_stats(
-        self,
-        time_seq,
-        out_format='datetime'
-    ):
+    def time_seq_stats(self, time_seq, out_format="datetime"):
         u = np.nanmean(time_seq)
         m = np.nanmedian(time_seq)
         s = np.nanstd(time_seq)
 
-        if out_format == 'datetime':
-            return mdates.num2date(u),mdates.num2date(m),mdates.num2date(s)
-        elif out_format == 'mdates':
+        if out_format == "datetime":
+            return mdates.num2date(u), mdates.num2date(m), mdates.num2date(s)
+        elif out_format == "mdates":
             return u, m, s
         else:
             return u, m, s
 
-    def mean_time(
-        self,
-        time_seq,
-        out_format='datetime'
-    ):
+    def mean_time(self, time_seq, out_format="datetime"):
         t = np.nanmean(time_seq)
 
-        if out_format=='datetime':
+        if out_format == "datetime":
             return mdates.num2date(t)
-        elif out_format=='mdates':
+        elif out_format == "mdates":
             return t
-        else: #default, return mdates
+        else:  # default, return mdates
             return t
 
-    def median_time(
-        self,
-        time_seq,
-        out_format='datetime'
-    ):
+    def median_time(self, time_seq, out_format="datetime"):
         t = np.nanmedian(time_seq)
 
-        if out_format=='datetime':
+        if out_format == "datetime":
             return mdates.num2date(t)
-        if out_format=='mdates':
+        if out_format == "mdates":
             return t
-        else: #default, return mdates
+        else:  # default, return mdates
             return t
-        
 
     def hist_sleep_qual(
         self,
@@ -731,6 +731,7 @@ class SleepNights(Sequence):
         time_final_awakening: bool = True,
         time_into_bed: bool = True,
         time_out_of_bed: bool = True,
+        round_to_nearest=40,
     ) -> typing.Tuple:
         fig, ax = plt.subplots(1, 1)
 
@@ -764,7 +765,7 @@ class SleepNights(Sequence):
         tmin = min(np.minimum.reduce(time_lst))
 
         # want nearest 18min interval of the day, which is 1/80 a day
-        round_to_nearest = 40
+        # round_to_nearest = 40
 
         hist_min = round(tmin * round_to_nearest - 1) / round_to_nearest
         hist_max = round(tmax * round_to_nearest + 1) / round_to_nearest
@@ -903,9 +904,10 @@ if __name__ == "__main__":
             sn.from_single_sleep_night_sequence(ssn_lst)
 
     # fig,ax = sn.plt_nightly_times()
-    # f2, a2 = sn.plt_hist_duration()
-    # f3, a3 = sn.plt_nightly_multihist()
+    f2, a2 = sn.plt_hist_duration()
+    f3, a3 = sn.plt_nightly_multihist(round_to_nearest=60)
     # f4, a4 = sn.plt_nightly_duration()
+
 
     # mt = mdates.num2date(np.median(sn.time_final_awakening))
     # print(mt)
@@ -925,42 +927,44 @@ if __name__ == "__main__":
     filter_week = sn.weeknight(include_sundays=True)
     filter_wknd = sn.weekend_night()
 
-    with open('results.txt','w') as f:
+    with open("results.txt", "w") as f:
         t = sn.mean_time(sn.time_try_to_sleep[filter_week])
-        f.write(f'  avg weeknight time try to sleep: {t.hour:>02}:{t.minute}\n')
+        f.write(f"  avg weeknight time try to sleep: {t.hour:>02}:{t.minute}\n")
 
         t = sn.mean_time(sn.time_try_to_sleep[filter_wknd])
-        f.write(f'    avg weekend time try to sleep: {t.hour:>02}:{t.minute}\n')
+        f.write(f"    avg weekend time try to sleep: {t.hour:>02}:{t.minute}\n")
 
         t = np.mean(sn.time_to_fall_asleep[filter_week])
-        f.write(f'avg weeknight time to fall asleep: {t:.1f}min\n')
+        f.write(f"avg weeknight time to fall asleep: {t:.1f}min\n")
 
         t = np.mean(sn.time_to_fall_asleep[filter_wknd])
-        f.write(f'  avg weekend time to fall asleep: {t:.1f}min\n')
+        f.write(f"  avg weekend time to fall asleep: {t:.1f}min\n")
 
         t = sn.mean_time(sn.time_final_awakening[filter_week])
-        f.write(f'       avg weeknight time wake up: {t.hour:>02}:{t.minute}\n')
+        f.write(f"       avg weeknight time wake up: {t.hour:>02}:{t.minute}\n")
 
         t = sn.mean_time(sn.time_final_awakening[filter_wknd])
-        f.write(f'         avg weekend time wake up: {t.hour:>02}:{t.minute}\n')
+        f.write(f"         avg weekend time wake up: {t.hour:>02}:{t.minute}\n")
 
-        f.write('\n')
+        f.write("\n")
         t = sn.median_time(sn.time_try_to_sleep[filter_week])
-        f.write(f'  median weeknight time try to sleep: {t.hour:>02}:{t.minute}\n')
+        f.write(f"  median weeknight time try to sleep: {t.hour:>02}:{t.minute}\n")
 
         t = sn.median_time(sn.time_try_to_sleep[filter_wknd])
-        f.write(f'    median weekend time try to sleep: {t.hour:>02}:{t.minute}\n')
+        f.write(f"    median weekend time try to sleep: {t.hour:>02}:{t.minute}\n")
 
         t = np.median(sn.time_to_fall_asleep[filter_week])
-        f.write(f'median weeknight time to fall asleep: {t:.1f}min\n')
+        f.write(f"median weeknight time to fall asleep: {t:.1f}min\n")
 
         t = np.median(sn.time_to_fall_asleep[filter_wknd])
-        f.write(f'  median weekend time to fall asleep: {t:.1f}min\n')
+        f.write(f"  median weekend time to fall asleep: {t:.1f}min\n")
 
         t = sn.median_time(sn.time_final_awakening[filter_week])
-        f.write(f'       median weeknight time wake up: {t.hour:>02}:{t.minute}\n')
+        f.write(f"       median weeknight time wake up: {t.hour:>02}:{t.minute}\n")
 
         t = sn.median_time(sn.time_final_awakening[filter_wknd])
-        f.write(f'         median weekend time wake up: {t.hour:>02}:{t.minute}\n')
-    
-    sn.to_soca_format_csv(pl.Path('./for_dr_soca.csv'))
+        f.write(f"         median weekend time wake up: {t.hour:>02}:{t.minute}\n")
+
+    sn.to_soca_format_csv(pl.Path("./for_dr_soca.csv"))
+
+    plt.show()
