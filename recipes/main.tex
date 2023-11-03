@@ -31,12 +31,13 @@
 
 \newcommand{\fromMom}{\textit{This recipe is from Mom.}}
 
-\newcommand{\recipe}[1]{
+\newcommand{\recipe}[2]{
     \addcontentsline
         {toc}
         {subsection}
         {#1}
         \section*{#1}
+		\label{recipe:#2}
 }
 \newcommand{\ingredients}{\subsubsection*{Ingredients}}
 \newcommand{\instructions}{\subsubsection*{Instructions}}
@@ -51,6 +52,7 @@
 \pagestyle{main}
 
 \include{./conversions}
+
 \chapter{Crock Pot and Slow Cooker}
 \include{./crock_pot/cp_BBQ_Loafers}
 \include{./crock_pot/cp_Chili}
@@ -77,6 +79,8 @@
 
 \chapter{Sweets and Desserts}
 \include{./other/jack_daniels_pie}
+\include{./other/graham_cracker_crust}
+\include{./other/key_lime_pie}
 \include{./other/no_bake_pb_bars}
 \include{./other/old_world_raspberry_bars}
 
