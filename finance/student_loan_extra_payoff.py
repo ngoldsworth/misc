@@ -154,17 +154,19 @@ if __name__ == "__main__":
         i, n, s = run_simulation(student_loans, pay)
         interest_paid.append(100*i/total_principle)
         periods_to_complete.append(n)
+        print(s)
 
 
-    plt.plot(monthly_amounts, interest_paid)
-    plt.xlabel('Monthly Payment Amount')
+    pay_ratio = [p/341.57 for p in monthly_amounts]
+    plt.plot(pay_ratio, interest_paid)
+    plt.xlabel('Monthly Payment / min starting payment')
     # plt.xscale('log')
     plt.ylabel('Percentage of original balance paid as interest')
 
     plt.figure()
     # plt.xscale('log')
-    plt.xlabel('Monthly Payment Amount')
+    plt.xlabel('Monthly Payment / min starting payment')
     plt.ylabel('Months to pay off loans')
-    plt.plot(monthly_amounts, periods_to_complete)
+    plt.plot(pay_ratio, periods_to_complete)
     plt.show()
     

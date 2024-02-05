@@ -20,11 +20,16 @@ student_loans = [
     (7920, 0.0505),
 ]
 
-
+saved = 7920
 sl = np.asarray(student_loans)
 # sort by interest rate
 sl = sl[sl[:, 1].argsort()]
-print(sl)
+
+for row in sl:
+    print(f'{row[0]:>10.2f} @ {row[1]:>.2%}')
+
+print(f'{sl[:,0].sum():>10.2f}')
+
 j = sl.shape[0] - 1
 while saved > 0:
     highest_interest_loan_amt = sl[j, 0]

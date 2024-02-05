@@ -15,9 +15,9 @@ def annuity(amount: float, apr: float, periods: int, periods_per_year: int = 12)
 
 if __name__ == "__main__":
 
-    forgiveness = 10000
+    forgiveness = 0
     months = 120
-    monthly_payment = 800
+    monthly_payment = 10000
 
     student_loans = [
         (8363, 0.0376),
