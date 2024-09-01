@@ -52,6 +52,8 @@ class Loan:
     @property
     def remaining_balance(self):
         return self._current_balance
+
+    @property
     def rate(self):
         return self._rate
 

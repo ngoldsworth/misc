@@ -21,6 +21,8 @@ student_loans = [
 ]
 
 saved = 7920
+
+
 sl = np.asarray(student_loans)
 # sort by interest rate
 sl = sl[sl[:, 1].argsort()]
