@@ -103,6 +103,7 @@ if __name__ == "__main__":
         "eecs_6.172_performance_engineering_software_systems": "https://ocw.mit.edu/courses/6-172-performance-engineering-of-software-systems-fall-2018/",
         "eecs_6.622_power_electronics": "https://ocw.mit.edu/courses/6-622-power-electronics-spring-2023/",
         "eecs_6.851_advanced_data_structures": "https://ocw.mit.edu/courses/6-851-advanced-data-structures-spring-2012/",
+        "eecs_RES.6-008_dsp" : "https://ocw.mit.edu/courses/res-6-008-digital-signal-processing-spring-2011/",
         "16.842_fundamentals_of_systems_engineering": "https://ocw.mit.edu/courses/16-842-fundamentals-of-systems-engineering-fall-2015/",
     }
 
