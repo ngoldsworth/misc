@@ -14,6 +14,12 @@ headers = {
     "Connection": "keep-alive",
 }
 
+def url_to_file(url, file, verbose=False):
+    r = requests.get(url)
+    with open(file, 'wb') as f:
+        f.write(r.content)
+    if verbose:
+        print(f'    ({file.stat().st_size >> 10:>10} kb)')
 
 def download_course(
     top_url: str,
@@ -39,6 +45,33 @@ def download_course(
         if not video_dir.exists():
             video_dir.mkdir(parents=True)
 
+        video_url = top_url + 'resources/lecture-videos/'
+        r_vid = requests.get(video_url)
+        data = bs4.BeautifulSoup(r_vid.text, "html.parser")
+        for l in data.find_all("a"):
+            loc_href = l['href']
+            x = urllib.parse.urlparse(loc_href)
+            if x.netloc == "":
+                p_dl_url = urllib.parse.urlparse(dl_url)
+                k = p_dl_url._replace(path=loc_href)
+                childurl = urllib.parse.urlunparse(k)
+            else:
+                childurl = loc_href
+            spl = urllib.parse.urlsplit(childurl)
+            path = pl.Path(spl.path)
+
+            is_video = get_videos and path.suffix.lower() == ".mp4"
+            if is_video:
+                savename = video_dir / path.name
+                if over_write or not savename.exists():
+                    url_to_file(childurl, savename, verbose=verbose)
+                    # r2 = requests.get(childurl, headers=headers)
+                    # with open(savename, "wb") as f:
+                    #     f.write(r2.content)
+                    # if verbose:
+                    #     print(f"      ({savename.stat().st_size >> 10:>10}kb) {savename}")
+    return
+
     data = bs4.BeautifulSoup(r.text, "html.parser")
     for l in data.find_all("a"):
         loc_href = l["href"]
@@ -58,21 +91,22 @@ def download_course(
         is_zip = path.suffix.lower() == ".zip"
         is_video = get_videos and path.suffix.lower() == ".mp4"
 
-        if is_zip or is_video:
-            if is_video:
-                savename = video_dir / path.name
-            else:
-                savename = target_dir / path.name
 
-            if over_write or not savename.exists():
-                r2 = requests.get(childurl, headers=headers)
-                with open(savename, "wb") as f:
-                    f.write(r2.content)
-                if verbose:
-                    print(f"      ({savename.stat().st_size >> 10:>10}kb) {savename}")
+        # if is_zip or is_video:
+        #     if is_video:
+        #         savename = video_dir / path.name
+        #     else:
+        #         savename = target_dir / path.name
 
-            elif verbose:
-                print(f"      (already done) {savename}")
+        #     if over_write or not savename.exists():
+        #         r2 = requests.get(childurl, headers=headers)
+        #         with open(savename, "wb") as f:
+        #             f.write(r2.content)
+        #         if verbose:
+        #             print(f"      ({savename.stat().st_size >> 10:>10}kb) {savename}")
+
+        #     elif verbose:
+        #         print(f"      (already done) {savename}")
 
 
 if __name__ == "__main__":
@@ -92,7 +126,7 @@ if __name__ == "__main__":
         "math_18.100A_real_analysis": "https://ocw.mit.edu/courses/18-100a-real-analysis-fall-2020/",
         "math_18.102_functional_analysis": "https://ocw.mit.edu/courses/18-102-introduction-to-functional-analysis-spring-2021/",
         "math_18.225_graph_theory_additive_cominatorics": "https://ocw.mit.edu/courses/18-225-graph-theory-and-additive-combinatorics-fall-2023/",
-        "math_18.s097_applied_category_theory": "https://ocw.mit.edu/courses/18-s097-applied-category-theory-january-iap-2019/",
+        # "math_18.s097_applied_category_theory": "https://ocw.mit.edu/courses/18-s097-applied-category-theory-january-iap-2019/",
         "math_18.404j_theory_of_computation": "https://ocw.mit.edu/courses/18-404j-theory-of-computation-fall-2020/",
         "eecs_6.003_signals_systems": "https://ocw.mit.edu/courses/6-003-signals-and-systems-fall-2011/",
         "eecs_6.006_intro_algo_2020": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/",
