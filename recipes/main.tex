@@ -3,7 +3,17 @@
 \usepackage{libertine}
 \usepackage{FiraMono}
 \usepackage{newclude}
-\usepackage{microtype}
+\usepackage[
+	 activate={true,nocompatibility},
+	 final,
+	 tracking=true,
+	 kerning=true,
+	 spacing=true,
+	 factor=1100,
+	 stretch=10,
+	 shrink=10
+]{microtype}
+\microtypecontext{spacing=nonfrench}
 \usepackage{amsmath}
 \usepackage{nicefrac}
 \usepackage{longtable}
@@ -31,13 +41,13 @@
 
 \newcommand{\fromMom}{\textit{This recipe is from Mom.}}
 
-\newcommand{\recipe}[2]{
+\newcommand{\recipe}[1]{
     \addcontentsline
         {toc}
         {subsection}
         {#1}
         \section*{#1}
-		\label{recipe:#2}
+		% \label{recipe:#2}
 }
 \newcommand{\ingredients}{\subsubsection*{Ingredients}}
 \newcommand{\instructions}{\subsubsection*{Instructions}}
@@ -52,6 +62,14 @@
 \pagestyle{main}
 
 \include{./conversions}
+
+\chapter{Baking}
+\include{./other/jack_daniels_pie}
+\include{./other/graham_cracker_crust}
+\include{./other/key_lime_pie}
+\include{./other/no_bake_pb_bars}
+\include{./other/old_world_raspberry_bars}
+\include{./other/earl_grey_lavender_scones}
 
 \chapter{Crock Pot and Slow Cooker}
 \include{./crock_pot/cp_BBQ_Loafers}
@@ -76,13 +94,6 @@
 \chapter{Other}
 \include{./other/beer_bread}
 \include{./other/cast_iron_mix}
-
-\chapter{Sweets and Desserts}
-\include{./other/jack_daniels_pie}
-\include{./other/graham_cracker_crust}
-\include{./other/key_lime_pie}
-\include{./other/no_bake_pb_bars}
-\include{./other/old_world_raspberry_bars}
 
 \chapter{Soup}
 \include{./crock_pot/cp_zuppa_toscana}
