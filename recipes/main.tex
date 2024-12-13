@@ -41,13 +41,13 @@
 
 \newcommand{\fromMom}{\textit{This recipe is from Mom.}}
 
-\newcommand{\recipe}[1]{
+\newcommand{\recipe}[2]{
     \addcontentsline
         {toc}
         {subsection}
         {#1}
         \section*{#1}
-		% \label{recipe:#2}
+		%\label{recipe:#2}
 }
 \newcommand{\ingredients}{\subsubsection*{Ingredients}}
 \newcommand{\instructions}{\subsubsection*{Instructions}}
@@ -62,14 +62,6 @@
 \pagestyle{main}
 
 \include{./conversions}
-
-\chapter{Baking}
-\include{./other/jack_daniels_pie}
-\include{./other/graham_cracker_crust}
-\include{./other/key_lime_pie}
-\include{./other/no_bake_pb_bars}
-\include{./other/old_world_raspberry_bars}
-\include{./other/earl_grey_lavender_scones}
 
 \chapter{Crock Pot and Slow Cooker}
 \include{./crock_pot/cp_BBQ_Loafers}
@@ -88,12 +80,15 @@
 \include{./crock_pot/cp_slow_cooker_beans_and_chilli}
 \include{./crock_pot/cp_turkey_breast}
 
-\chapter{Grill}
 \include{./grill/turkey_burgers}
-
-\chapter{Other}
-\include{./other/beer_bread}
 \include{./other/cast_iron_mix}
+
+\chapter{Sweets and Desserts}
+\include{./other/jack_daniels_pie}
+\include{./other/graham_cracker_crust}
+\include{./other/key_lime_pie}
+\include{./other/no_bake_pb_bars}
+\include{./other/old_world_raspberry_bars}
 
 \chapter{Soup}
 \include{./crock_pot/cp_zuppa_toscana}

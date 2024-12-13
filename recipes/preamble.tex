@@ -1,0 +1,40 @@
+
+\usepackage{libertine}
+\usepackage{FiraMono}
+\usepackage{newclude}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{nicefrac}
+\usepackage{longtable}
+\usepackage{subfig}
+
+\usepackage[
+	outer=1.25in,
+	inner=1.5in,
+	headsep=.5in,
+]{geometry}
+
+
+\usepackage[pagestyles]{titlesec}
+		\newpagestyle{main2}{
+				 \sethead[\small{\textsc{\oldstylenums{\thepage}\quad|\quad recipes}}][][]
+				 {}{}{\small{\textsc{chapter \oldstylenums{\thechapter}: \MakeLowercase{\chaptertitle} \quad | \quad \oldstylenums{\thepage}}}}
+					 }
+		\newpagestyle{main}{
+				\sethead[\small{\oldstylenums{\thepage}}][\small{\textit{Chapter \oldstylenums{\thechapter}}}][]
+				{}{\small{\textit{\chaptertitle}}}{\small{\oldstylenums{\thepage}}}
+					 }
+
+\newcommand{\fromMom}{\textit{This recipe is from Mom.}}
+
+\newcommand{\recipe}[2]{
+    \addcontentsline
+        {toc}
+        {subsection}
+        {#1}
+        \section*{#1}
+		\label{recipe:#2}
+}
+\newcommand{\ingredients}{\subsubsection*{Ingredients}}
+\newcommand{\instructions}{\subsubsection*{Instructions}}
+\newcommand{\notes}{\paragraph*{Notes}}
