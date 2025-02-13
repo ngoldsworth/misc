@@ -889,7 +889,7 @@ if __name__ == "__main__":
         sn.get_sheets_data(spreadsheet_id, sheetrange)
         as_lst = []
         for j, ssn in enumerate(sn):
-            print(j, ssn.date)
+            # print(j, ssn.date)
             as_lst.append(ssn)
 
         with open(pkl_file, "wb") as o:

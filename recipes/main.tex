@@ -3,7 +3,45 @@
 \title{Recipes I've Collected}
 \author{Nelson G}
 
-\include{./preamble}
+\usepackage{libertine}
+\usepackage{FiraMono}
+\usepackage{newclude}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{nicefrac}
+\usepackage{longtable}
+\usepackage{subfig}
+
+\usepackage[
+	outer=1.25in,
+	inner=1.5in,
+	headsep=.5in,
+]{geometry}
+
+
+\usepackage[pagestyles]{titlesec}
+		\newpagestyle{main2}{
+				 \sethead[\small{\textsc{\oldstylenums{\thepage}\quad|\quad recipes}}][][]
+				 {}{}{\small{\textsc{chapter \oldstylenums{\thechapter}: \MakeLowercase{\chaptertitle} \quad | \quad \oldstylenums{\thepage}}}}
+					 }
+		\newpagestyle{main}{
+				\sethead[\small{\oldstylenums{\thepage}}][\small{\textit{Chapter \oldstylenums{\thechapter}}}][]
+				{}{\small{\textit{\chaptertitle}}}{\small{\oldstylenums{\thepage}}}
+					 }
+
+\newcommand{\fromMom}{\textit{This recipe is from Mom.}}
+
+\newcommand{\recipe}[1]{
+    \addcontentsline
+        {toc}
+        {subsection}
+        {#1}
+        \section*{#1}
+		\label{recipe:#1}
+}
+\newcommand{\ingredients}{\subsubsection*{Ingredients}}
+\newcommand{\instructions}{\subsubsection*{Instructions}}
+\newcommand{\notes}{\paragraph*{Notes}}
 
 \begin{document}
 
@@ -13,7 +51,7 @@
 
 \pagestyle{main}
 
-\include{./conversions}
+%\include{./conversions}
 
 \chapter{Soup}
 \include{./crock_pot/cp_zuppa_toscana}
@@ -40,6 +78,7 @@
 
 \chapter{Sides}
 \include{./other/beer_bread}
+\include{./other/cilantro_lime_quinoa_salad}
 
 \chapter{Sweets and Desserts}
 \include{./other/jack_daniels_pie}

@@ -48,10 +48,22 @@ def restricted_growth_string_generator(seqlen: int, unique_ct=None):
 if __name__ == "__main__":
 
     j = 0
-    for s in restricted_growth_string_generator(5, 2):
+    import time
+    from math import perm
+
+    digicount = 10
+    unique_digit_counts = {j:0 for j in list(range(1,digicount+1))}
+
+
+    t0 = time.time()
+    for s in restricted_growth_string_generator(digicount, unique_ct=3):
         # print(''.join([chr(j+65) for j in s]), len(set(s)))
         print("".join([chr(j + 65) for j in s]))
+        # print(s)
+        num_unique_digits = len(set(s))
 
-        j += 1
+        unique_digit_counts[num_unique_digits] += perm(digicount, num_unique_digits)
 
-    print(j)
+    total = sum(v for k,v in unique_digit_counts.items())
+    print(unique_digit_counts)
+    print(total)
