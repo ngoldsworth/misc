@@ -1,4 +1,3 @@
-from calendar import month
 import loans
 from math import ceil
 import numpy as np

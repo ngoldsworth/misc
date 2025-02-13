@@ -1,4 +1,6 @@
 import bs4
+import time
+import random
 import requests
 
 import urllib.parse
@@ -14,12 +16,31 @@ headers = {
     "Connection": "keep-alive",
 }
 
-def url_to_file(url, file, verbose=False):
-    r = requests.get(url)
-    with open(file, 'wb') as f:
-        f.write(r.content)
-    if verbose:
-        print(f'    ({file.stat().st_size >> 10:>10} kb)')
+def url_to_file(url, file, verbose=False, over_write=False):
+    if file.exists() and not over_write:
+        parenthetical = 'already done'
+
+    else:
+        r = requests.get(url)
+        with open(file, 'wb') as f:
+            f.write(r.content)
+            parenthetical = str(file.stat().st_size >> 10) + ' KiB'
+        time.sleep(random.gauss(4,.5))
+
+    if verbose: 
+        print(f'    ({parenthetical:>14}) {file.name}')
+
+def href_to_correct_childurl(loc_href, dl_url, ):
+    x = urllib.parse.urlparse(loc_href)
+    if x.netloc == "":
+        p_dl_url = urllib.parse.urlparse(dl_url)
+        k = p_dl_url._replace(path=loc_href)
+        childurl = urllib.parse.urlunparse(k)
+    else:
+        childurl = loc_href
+    spl = urllib.parse.urlsplit(childurl)
+    path = pl.Path(spl.path)
+    return path, childurl
 
 def download_course(
     top_url: str,
@@ -49,68 +70,40 @@ def download_course(
         r_vid = requests.get(video_url)
         data = bs4.BeautifulSoup(r_vid.text, "html.parser")
         for l in data.find_all("a"):
-            loc_href = l['href']
-            x = urllib.parse.urlparse(loc_href)
-            if x.netloc == "":
-                p_dl_url = urllib.parse.urlparse(dl_url)
-                k = p_dl_url._replace(path=loc_href)
-                childurl = urllib.parse.urlunparse(k)
-            else:
-                childurl = loc_href
-            spl = urllib.parse.urlsplit(childurl)
-            path = pl.Path(spl.path)
+            # loc_href = l['href']
+            # x = urllib.parse.urlparse(loc_href)
+            # if x.netloc == "":
+            #     p_dl_url = urllib.parse.urlparse(dl_url)
+            #     k = p_dl_url._replace(path=loc_href)
+            #     childurl = urllib.parse.urlunparse(k)
+            # else:
+            #     childurl = loc_href
+            # spl = urllib.parse.urlsplit(childurl)
+            # path = pl.Path(spl.path)
 
+            path, childurl = href_to_correct_childurl(l['href'], dl_url)
             is_video = get_videos and path.suffix.lower() == ".mp4"
+
             if is_video:
                 savename = video_dir / path.name
-                if over_write or not savename.exists():
-                    url_to_file(childurl, savename, verbose=verbose)
-                    # r2 = requests.get(childurl, headers=headers)
-                    # with open(savename, "wb") as f:
-                    #     f.write(r2.content)
-                    # if verbose:
-                    #     print(f"      ({savename.stat().st_size >> 10:>10}kb) {savename}")
-    return
+                url_to_file(childurl, savename, verbose=verbose)
 
     data = bs4.BeautifulSoup(r.text, "html.parser")
     for l in data.find_all("a"):
         loc_href = l["href"]
 
         # sometimes href has entire URL, others it doesnt
-        x = urllib.parse.urlparse(loc_href)
-        if x.netloc == "":
-            p_dl_url = urllib.parse.urlparse(dl_url)
-            k = p_dl_url._replace(path=loc_href)
-            childurl = urllib.parse.urlunparse(k)
-        else:
-            childurl = loc_href
-
-        spl = urllib.parse.urlsplit(childurl)
-        path = pl.Path(spl.path)
-
+        path, childurl = href_to_correct_childurl(l['href'], dl_url)
         is_zip = path.suffix.lower() == ".zip"
-        is_video = get_videos and path.suffix.lower() == ".mp4"
 
-
-        # if is_zip or is_video:
-        #     if is_video:
-        #         savename = video_dir / path.name
-        #     else:
-        #         savename = target_dir / path.name
-
-        #     if over_write or not savename.exists():
-        #         r2 = requests.get(childurl, headers=headers)
-        #         with open(savename, "wb") as f:
-        #             f.write(r2.content)
-        #         if verbose:
-        #             print(f"      ({savename.stat().st_size >> 10:>10}kb) {savename}")
-
-        #     elif verbose:
-        #         print(f"      (already done) {savename}")
+        if is_zip:
+            savename = target_dir / path.name
+            url_to_file(childurl, savename, verbose=verbose, over_write=over_write)
 
 
 if __name__ == "__main__":
-    top_dir = pl.Path(r"C:\Users\nelson.goldsworth\Desktop\mit_ocw")
+    # top_dir = pl.Path(r"C:\Users\nelson.goldsworth\Desktop\mit_ocw")
+    top_dir = pl.Path(r"W:\NELSON\Desktop\mit_ocw")
     course_urls = {
         # 'phys_8.701_particle': 'https://ocw.mit.edu/courses/8-701-introduction-to-nuclear-and-particle-physics-fall-2020/',
         "phys_8.421_atomic_optical_1": "https://ocw.mit.edu/courses/8-421-atomic-and-optical-physics-i-spring-2014/",
@@ -131,7 +124,7 @@ if __name__ == "__main__":
         "eecs_6.003_signals_systems": "https://ocw.mit.edu/courses/6-003-signals-and-systems-fall-2011/",
         "eecs_6.006_intro_algo_2020": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/",
         "eecs_6.006_intro_algo_2011": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/",
-        "eecs_6.042j_math_for_compsci": "https://ocw.mit.edu/courses/6-042j-mathematics-for-computer-science-fall-2010/",
+        # "eecs_6.042j_math_for_compsci": "https://ocw.mit.edu/courses/6-042j-mathematics-for-computer-science-fall-2010/",
         "eecs_6.046j_intro_algo_2": "https://ocw.mit.edu/courses/6-042j-mathematics-for-computer-science-spring-2015/",
         "eecs_6.046j_design_analysis_algo_sp2015": "https://ocw.mit.edu/courses/6-046j-design-and-analysis-of-algorithms-spring-2015/",
         "eecs_6.172_performance_engineering_software_systems": "https://ocw.mit.edu/courses/6-172-performance-engineering-of-software-systems-fall-2018/",
@@ -149,3 +142,5 @@ if __name__ == "__main__":
             get_videos=True,
             verbose=True,
         )
+
+        # time.sleep(random.gauss(15,5))

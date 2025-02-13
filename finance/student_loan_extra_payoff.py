@@ -133,8 +133,8 @@ if __name__ == "__main__":
     import matplotlib.pyplot as  plt
     import numpy as np
 
-    # monthly_amounts = [350 + (12.5*x) for x in range(100)]
-    # monthly_amounts = 700 * np.logspace(0, 1, base=10, num=100)
+    monthly_amounts = [350 + (12.5*x) for x in range(35)]
+    # # monthly_amounts = 700 * np.logspace(0, 1, base=10, num=100)
     monthly_amounts = np.linspace(800, 4000,  num=1000)
     # print(monthly_amounts)
 
@@ -142,17 +142,15 @@ if __name__ == "__main__":
     interest_paid = []
 
     for pay in monthly_amounts:
-        student_loan_pds = 117  # number of payments left as of 2024-jan-02
-        car_loan_periods = 72 - 15
-        # loan info as of 2024-Jan-02
+        periods = 109  # number of payments left as of 2024-sept-1
+        # loan info as of 2024sept1
         all_loans = [
-            Loan(principle=5631.61, per_period_interest=4.04 / (100 * 12), periods=student_loan_pds, name="Fed 1-01"),
-            Loan(principle=8286.29, per_period_interest=3.51 / (100 * 12), periods=student_loan_pds, name="Fed 1-02"),
-            Loan(principle=8134.01, per_period_interest=4.20 / (100 * 12), periods=student_loan_pds, name="Fed 1-03" ),
-            Loan(principle=7763.68, per_period_interest=4.80 / (100 * 12), periods=student_loan_pds, name="Fed 1-04" ),
-            Loan(principle=3001.33, per_period_interest=4.28 / (100 * 12), periods=student_loan_pds, name="Fed 1-05" ),
-            # Loan(principle=7200.00, per_period_interest=27.99 / (100 * 12), periods=5*12, name="CC" ),
-            Loan(principle=19_279.65, per_period_interest=3.90 / (100 * 12), periods=car_loan_periods, name="Car Loan"),
+            Loan(principle=5308.23, per_period_interest=4.04 / (100 * 12), periods=periods, name="Fed 1-01"),
+            Loan(principle=7786.51, per_period_interest=3.51 / (100 * 12), periods=periods, name="Fed 1-02"),
+            Loan(principle=7660.48, per_period_interest=4.20 / (100 * 12), periods=periods, name="Fed 1-03" ),
+            Loan(principle=6874.58, per_period_interest=4.80 / (100 * 12), periods=periods, name="Fed 1-04" ),
+            Loan(principle=2831.26, per_period_interest=4.28 / (100 * 12), periods=periods, name="Fed 1-05" ),
+            # Loan(principle=10000.00, per_period_interest=24.99 / (100 * 12), periods=periods, name="CC" ),
         ]
         total_principle = sum([ln.remaining_balance for ln in all_loans])
         total_min_mntly = sum([ln.minimum_payment for ln in all_loans])
@@ -162,19 +160,29 @@ if __name__ == "__main__":
         i, n, s = run_simulation(all_loans, pay)
         interest_paid.append(100*i/total_principle)
         periods_to_complete.append(n)
-        # print(s)
+        print(s)
 
 
-    pay_ratio = [p/712.66 for p in monthly_amounts]
-    plt.plot(monthly_amounts, interest_paid)
-    plt.xlabel('Monthly Payment')
+    ratio = False
+    if ratio:
+        xaxis = [p/341.57 for p in monthly_amounts]
+        s_xlabel = 'Monthly Payment / min starting payment'
+    else:
+        xaxis = monthly_amounts
+        s_xlabel = 'Monthly Payment'
+
+    plt.plot(xaxis, interest_paid)
+    plt.xlabel(s_xlabel)
     # plt.xscale('log')
     plt.ylabel('Percentage of original balance paid as interest')
 
     plt.figure()
     # plt.xscale('log')
-    plt.xlabel('Monthly Payment')
+    plt.xlabel(s_xlabel)
     plt.ylabel('Months to pay off loans')
-    plt.plot(monthly_amounts, periods_to_complete)
-    plt.show()
+    plt.plot(xaxis, periods_to_complete)
+
+    for mnth, pers, perc_int in zip(monthly_amounts, periods_to_complete, interest_paid):
+        print(f'{mnth:>7.2f}, {pers:>3}, {perc_int/100:>.5%}')
     
+    plt.show()

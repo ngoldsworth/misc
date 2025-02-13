@@ -1,5 +1,31 @@
 \documentclass{book}
 
+\usepackage{libertine}
+\usepackage{FiraMono}
+\usepackage{newclude}
+\usepackage[
+	 activate={true,nocompatibility},
+	 final,
+	 tracking=true,
+	 kerning=true,
+	 spacing=true,
+	 factor=1100,
+	 stretch=10,
+	 shrink=10
+]{microtype}
+\microtypecontext{spacing=nonfrench}
+\usepackage{amsmath}
+\usepackage{nicefrac}
+% \usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{subfig}
+
+\usepackage[
+	outer=1.25in,
+	inner=1.5in,
+	headsep=.5in,
+]{geometry}
+
 \title{Recipes I've Collected}
 \author{Nelson G}
 
@@ -53,10 +79,7 @@
 
 %\include{./conversions}
 
-\chapter{Soup}
-\include{./crock_pot/cp_zuppa_toscana}
-
-\chapter{Main Dishes}
+\chapter{Crock Pot and Slow Cooker}
 \include{./crock_pot/cp_BBQ_Loafers}
 \include{./crock_pot/cp_Chili}
 \include{./crock_pot/cp_Honey_chicken_thighs_}
@@ -87,5 +110,7 @@
 \include{./other/no_bake_pb_bars}
 \include{./other/old_world_raspberry_bars}
 
+\chapter{Soup}
+\include{./crock_pot/cp_zuppa_toscana}
 
 \end{document}
