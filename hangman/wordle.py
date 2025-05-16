@@ -63,13 +63,11 @@ def guess_compare(guess, answer):
 if __name__ == "__main__":
     yellows = {
         # 'n': (0, 3) # n is not in spot 0 or spot 3
-        'r':(1,3),
-        'a':(1,2,3),
-
+        
     }
-    greens = "ru___"
-
-    excluded_letters = "cnestkzol"
+    # greens = "_a_er"
+    greens = "_____"
+    excluded_letters = "craneolspuy"
 
     excluded = set(list(excluded_letters))
 
