@@ -7,7 +7,7 @@ def digitsum(n):
     return sum([int(c) for c in list(str(n))])
 
 
-N = 3000
+N = 300
 arr = np.zeros((N, N))
 
 for j in range(N):

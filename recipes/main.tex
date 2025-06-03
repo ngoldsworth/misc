@@ -3,6 +3,35 @@
 \usepackage{libertine}
 \usepackage{FiraMono}
 \usepackage{newclude}
+\usepackage[
+	 activate={true,nocompatibility},
+	 final,
+	 tracking=true,
+	 kerning=true,
+	 spacing=true,
+	 factor=1100,
+	 stretch=10,
+	 shrink=10
+]{microtype}
+\microtypecontext{spacing=nonfrench}
+\usepackage{amsmath}
+\usepackage{nicefrac}
+% \usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{subfig}
+
+\usepackage[
+	outer=1.25in,
+	inner=1.5in,
+	headsep=.5in,
+]{geometry}
+
+\title{Recipes I've Collected}
+\author{Nelson G}
+
+\usepackage{libertine}
+\usepackage{FiraMono}
+\usepackage{newclude}
 \usepackage{microtype}
 \usepackage{amsmath}
 \usepackage{nicefrac}
@@ -14,9 +43,6 @@
 	inner=1.5in,
 	headsep=.5in,
 ]{geometry}
-
-\title{Recipes I've Collected}
-\author{Nelson G}
 
 
 \usepackage[pagestyles]{titlesec}
@@ -31,13 +57,13 @@
 
 \newcommand{\fromMom}{\textit{This recipe is from Mom.}}
 
-\newcommand{\recipe}[2]{
+\newcommand{\recipe}[1]{
     \addcontentsline
         {toc}
         {subsection}
         {#1}
         \section*{#1}
-		\label{recipe:#2}
+		\label{recipe:#1}
 }
 \newcommand{\ingredients}{\subsubsection*{Ingredients}}
 \newcommand{\instructions}{\subsubsection*{Instructions}}
@@ -51,7 +77,7 @@
 
 \pagestyle{main}
 
-\include{./conversions}
+%\include{./conversions}
 
 \chapter{Crock Pot and Slow Cooker}
 \include{./crock_pot/cp_BBQ_Loafers}
@@ -70,12 +96,12 @@
 \include{./crock_pot/cp_slow_cooker_beans_and_chilli}
 \include{./crock_pot/cp_turkey_breast}
 
-\chapter{Grill}
 \include{./grill/turkey_burgers}
-
-\chapter{Other}
-\include{./other/beer_bread}
 \include{./other/cast_iron_mix}
+
+\chapter{Sides}
+\include{./other/beer_bread}
+\include{./other/cilantro_lime_quinoa_salad}
 
 \chapter{Sweets and Desserts}
 \include{./other/jack_daniels_pie}

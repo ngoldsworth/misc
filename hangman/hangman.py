@@ -24,7 +24,10 @@ def possible_words(file: pl.Path, word: str, excluded: str):
             if item == c:
                 lst.remove(c)
 
-    print(max(set(lst), key=lst.count))
+    if len(lst) == 0:
+        print('NO MATCHES')
+    else:
+        print(max(set(lst), key=lst.count))
 
 
 def best_next_word(file: pl.Path, word: str, excluded: str):
@@ -34,7 +37,7 @@ def best_next_word(file: pl.Path, word: str, excluded: str):
 
 
 if __name__ == "__main__":
-    main_word = "cr___"
-    excludes = "sotlirp"
+    main_word = "__lve"
+    excludes = "rtginmcgaso"
     possible_words(pl.Path("./hangman/wordlist.txt"), main_word, excludes)
     # best_next_word(pl.Path('./wordlist.txt'), 'word', 'zr')

@@ -1,5 +1,34 @@
 \documentclass{book}
-\usepackage{mathpazo}
+
+\usepackage[
+	 activate={true,nocompatibility},
+	 final,
+	 tracking=true,
+	 kerning=true,
+	 spacing=true,
+	 factor=1100,
+	 stretch=10,
+	 shrink=10
+]{microtype}
+\microtypecontext{spacing=nonfrench}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{libertine}
+% \usepackage{ebgaramond}
+% \usepackage{garamondx}
+% \usepackage{CormorantGaramond}
+
+\usepackage[pagestyles]{titlesec}
+		\newpagestyle{ps_main}{
+				 \sethead[\small{\textsc{\oldstylenums{\thepage}\quad|\quad chapter \oldstylenums{\thechapter}}}][][]
+				 {}{}{\small{\textsc{\MakeLowercase{\chaptertitle} \quad | \quad \oldstylenums{\thepage}}}}
+					 }
+		\newpagestyle{ps_front}{
+				\sethead
+                [\small{\oldstylenums{\thepage}}][\small{\textit{\chaptertitle}}][]
+				{}{\small{\textit{\chaptertitle}}}{\small{\oldstylenums{\thepage}}}
+					 }
 
 \title{Mindfulness in Plain English}
 \author{Venerable Henepola Gunaratana}
@@ -9,12 +38,20 @@
 
 %\maketitle
 
+
 \frontmatter
+    \pagestyle{empty}
+    \maketitle
+    \input{about_the_author}
     \tableofcontents
-    \input{frontmatter.tex}
+
+    \pagestyle{ps_front}
+
+    \input{preface.tex}
     \input{ch-0-intro.tex}
 
 \mainmatter
+    \pagestyle{ps_main}
     \input{ch-01-meditation-why-bother.tex}
     \input{ch-02-what-meditation-isnt.tex}
     \input{ch-03-what-meditation-is.tex}
@@ -25,7 +62,7 @@
     \input{ch-08-structuring.tex}
     \input{ch-09-set-up-exercises.tex}
     \input{ch-10-dealing-with-problems.tex}
-    \input{ch-11-12-dealing-with-problems.tex}
+    \input{ch-11-12-dealing-with-distractions.tex}
     \input{ch-13-mindfulness.tex}
     \input{ch-14-mindfulness-vs-concentration.tex}
     \input{ch-15-meditation-in-everyday-life.tex}

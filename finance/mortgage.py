@@ -2,10 +2,10 @@ import loans
 from math import ceil
 
 if __name__ == "__main__":
-    cost = 33173
-    down = 5000
-    term = 119
-    apr = 4.5 / 100
+    cost = 600_000
+    down = 50000
+    term = 360
+    apr = 6.5 / 100
 
     initial_amount = cost - down
     rent_in = 0
